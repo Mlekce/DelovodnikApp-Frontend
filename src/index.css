@@ -1,6 +1,6 @@
 @import "tailwindcss";
+@import "./custom-datepicker.css";
 
-.logo {
-    height: 60px;
-    width: auto;
+.react-datepicker-wrapper {
+    width: 100% ;
 }

@@ -1,7 +1,10 @@
 import { useState } from "react";
+
 import logo from "../assets/logo.png";
 import hamburger from "../assets/hamburger36.png";
+
 import "../index.css"
+
 
 export default function Header() {
     const [isOpen, setIsOpen] = useState(false);
@@ -9,6 +12,7 @@ export default function Header() {
     function toggleMenu() {
         setIsOpen(prev => !prev);
     }
+
     return (
         <>
             <header className="bg-indigo-800 text-white p-4 ">
@@ -27,18 +31,22 @@ export default function Header() {
 
                     {/* Desktop meni */}
                     <nav className="hidden md:flex gap-6">
-                        <a href="#" className="hover:underline">Početna</a>
-                        <a href="#" className="hover:underline">Statistika</a>
-                        <a href="#" className="hover:underline">Korisnici</a>
+                        <a href="/" className="hover:underline">Početna</a>
+                        <a href="/statistika" className="hover:underline">Statistika</a>
+                        <a href="/korisnici" className="hover:underline">Korisnici</a>
+                        <a href="/profil" className="hover:underline">Profil</a>
+                        <a href="/izlogujse" className="hover:underline">Izadji</a>
                     </nav>
                 </div>
 
                 {/* Mobile meni */}
                 {isOpen && (
                     <div className="mt-4 md:hidden flex flex-col gap-2" >
-                        <a href="#" className="hover:underline">Početna</a>
-                        <a href="#" className="hover:underline">Statistika</a>
-                        <a href="#" className="hover:underline">Korisnici</a>
+                        <a href="/" className="hover:underline">Početna</a>
+                        <a href="/statistika" className="hover:underline">Statistika</a>
+                        <a href="/korisnici" className="hover:underline">Korisnici</a>
+                        <a href="/profil" className="hover:underline">Profil</a>
+                        <a href="/izlogujse" className="hover:underline">Izadji</a>
                     </div>
                 )}
             </header >
