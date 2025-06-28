@@ -32,9 +32,11 @@ export default function Header() {
                     {/* Desktop meni */}
                     <nav className="hidden md:flex gap-6">
                         <a href="/" className="hover:underline">Početna</a>
+                        <a href="/delovodnik" className="hover:underline">Unos</a>
+                        <a href="/pracenje" className="hover:underline">Pracenje</a>
                         <a href="/statistika" className="hover:underline">Statistika</a>
                         <a href="/korisnici" className="hover:underline">Korisnici</a>
-                        <a href="/profil" className="hover:underline">Profil</a>
+                        <a href="/profil" className="hover:underline">Nalog</a>
                         <a href="/izlogujse" className="hover:underline">Izadji</a>
                     </nav>
                 </div>
