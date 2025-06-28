@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import DatePicker, { registerLocale } from "react-datepicker"
 import { sr } from "date-fns/locale"
 import { addDays, format } from "date-fns"

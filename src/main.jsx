@@ -8,6 +8,8 @@ import Login from "./components/Login"
 import Stranica404 from './components/Stranica404.jsx'
 import PretragaPredmeta from './components/PretragaPredmeta.jsx'
 import Korisnici from './components/TabelaKoriniska.jsx'
+import KomponentaNalog from './components/Nalog.jsx'
+import StranicaStatistika from './components/Statistika.jsx'
 
 const router = createBrowserRouter([
   { path: "/", element: <Login /> },
@@ -15,7 +17,9 @@ const router = createBrowserRouter([
   { path: "/pocetna", element: <Navigate to="/" replace /> },
   { path: "/pracenje", element: <PretragaPredmeta /> },
   { path: "/korisnici", element: <Korisnici /> },
+  { path: "/statistika", element: <StranicaStatistika /> },
   { path: "/delovodnik", element: <App /> },
+  { path: "/profil", element: <KomponentaNalog /> },
   { path: "*", element: <Stranica404 /> }
 ]);
 
