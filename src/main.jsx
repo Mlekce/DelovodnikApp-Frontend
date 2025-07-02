@@ -10,9 +10,11 @@ import PretragaPredmeta from './components/PretragaPredmeta.jsx'
 import Korisnici from './components/TabelaKoriniska.jsx'
 import KomponentaNalog from './components/Nalog.jsx'
 import StranicaStatistika from './components/Statistika.jsx'
+import Register from "./components/Register.jsx"
 
 const router = createBrowserRouter([
   { path: "/", element: <Login /> },
+  { path: "/register", element: <Register />},
   { path: "/index", element: <Navigate to="/" replace /> },
   { path: "/pocetna", element: <Navigate to="/" replace /> },
   { path: "/pracenje", element: <PretragaPredmeta /> },

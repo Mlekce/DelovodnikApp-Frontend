@@ -37,7 +37,7 @@ export default function Login(){
 
     <p className="mt-10 text-center text-sm/6 text-gray-500">
       Nemate nalog?
-      <a href="mailto:administrator@example.com" className="font-semibold text-indigo-600 hover:text-indigo-500"> Kontaktirajte administratora</a>
+      <a href="/register" className="font-semibold text-indigo-600 hover:text-indigo-500"> Registruj se</a>
     </p>
   </div>
 </div>
