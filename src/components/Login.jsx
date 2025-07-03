@@ -13,7 +13,7 @@ export default function Login() {
     const lozinka = formData.get("password");
 
     async function posaljiNaBekend(email, lozinka) {
-      const url = "http://localhost:4000/api/login";
+      const url = "http://localhost:5173/api/login";
       try {
         const options = {
           method: "POST",
@@ -29,22 +29,24 @@ export default function Login() {
         return { ok: res.ok, data };
       } catch (err) {
         console.error(err);
-        setPoruka("Greška pri slanju podataka.");
         return { ok: false, data: null };
       }
     }
 
     posaljiNaBekend(email, lozinka).then(({ ok, data }) => {
-      if (!ok) {
-        setPoruka(data?.poruka || "Neuspešna prijava.");
+      if (!ok || !data?.token) {
+        setPoruka("Prijava nije uspela. Proverite podatke.");
         return;
       }
 
-      setPoruka(data.poruka);
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("korisnik", JSON.stringify(data.korisnik));
+
+      setPoruka("Uspešno ste prijavljeni!");
 
       setTimeout(() => {
-        navigate("/delovodnik");
-      }, 3000);
+        navigate("/dashboard");
+      }, 2000);
     });
   }
   return (
