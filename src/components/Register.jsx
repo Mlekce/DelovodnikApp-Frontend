@@ -1,13 +1,15 @@
 import icon from "../assets/favicon.ico";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import validator from "validator";
 
-export default function Login() {
+export default function Register() {
+  const navigate = useNavigate();
   let [poruka, setPoruka] = React.useState(null);
 
   function posaljiPodatke(event) {
     event.preventDefault();
-    const formData = new FormData(event.target);
+    const formData = new FormData(event.currentTarget);
     const email = formData.get("email");
     const password = formData.get("password");
     const cpassword = formData.get("cpassword");
@@ -39,7 +41,7 @@ export default function Login() {
       return true
     }
 
-    let url = "http://localhost:5173/register";
+    let url = "http://localhost:4000/api/register";
     let obradjenEmail = validateEmail(email);
     let passwordTest = validatePasword(password, cpassword);
 
@@ -58,13 +60,28 @@ export default function Login() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
+          ime: "Srdjan S",
           email,
-          password: pass
+          lozinka: pass,
+          uloga: "admin",
+          sluzba: "Sektor DT",
+          avatar: null
         })
       }
-      let response = await fetch(url, options);
-      let data = await response.json()
-      console.log(data)
+      try {
+        let response = await fetch(url, options);
+        let data = await response.json();
+        setPoruka(data.poruka);
+
+        if (response.ok) {
+          setTimeout(() => {
+            navigate("/login")
+          }, 3000)
+        }
+      } catch (error) {
+        setPoruka("Greška pri slanju podataka.");
+        console.error(err);
+      }
     }
   }
 
@@ -75,12 +92,12 @@ export default function Login() {
         <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Delovodnik registracija </h2>
       </div>
       {poruka &&
-        <div className="block text-sm/6 font-medium text-gray-900">
+        <div className="block text-sm/6 font-medium mt-5 text-green-600 text-center">
           {poruka}
         </div>
       }
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form className="space-y-6" action="#" method="POST">
+        <form className="space-y-6" onSubmit={posaljiPodatke}>
           <div>
             <label htmlFor="email" className="block text-sm/6 font-medium text-gray-900">Email adresa</label>
             <div className="mt-2">
