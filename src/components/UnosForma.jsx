@@ -39,10 +39,17 @@ export default function FormaPredmet() {
     const referent = formData.get("referent");
     const d8 = formData.get("pravosnaznost8");
     const d30 = formData.get("pravosnaznost30");
-    const dPravosnaznosti = d8 ? format(d8, "yyyy-MM-dd") : format(d30, "yyyy-MM-dd");
+    let dPravosnaznosti = "";
 
-    if (d30 && d8) {
-      setPoruka("Korisnička greška: Očisti jedno polje pravosnažnosti!");
+    if (d8 && !d30) {
+      dPravosnaznosti = format(new Date(d8), "yyyy-MM-dd");
+    } else if (!d8 && d30) {
+      dPravosnaznosti = format(new Date(d30), "yyyy-MM-dd");
+    } else if (d8 && d30) {
+      setPoruka("Korisnička greška: Obrisite jedno od polja pravosnažnosti!");
+      return;
+    } else {
+      setPoruka("Morate uneti bar jedan datum pravosnažnosti!");
       return;
     }
 
