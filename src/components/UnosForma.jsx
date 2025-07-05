@@ -4,6 +4,7 @@ import { sr } from "date-fns/locale"
 import { addDays, format } from "date-fns"
 import "react-datepicker/dist/react-datepicker.css"
 import "../custom-datepicker.css" // (vidi ispod)
+import { mainSevenDays, mainThirtyDays } from "../../public/scripts/vreme"
 
 registerLocale("sr", sr)
 
@@ -11,13 +12,14 @@ export default function FormaPredmet() {
   const [datumPodnosenja, setDatumPodnosenja] = useState(null)
   const [pravosnaznost8, setPravosnaznost8] = useState("")
   const [pravosnaznost30, setPravosnaznost30] = useState("")
+  const user = JSON.parse(localStorage.getItem("korisnik"));
 
   function izracunajDatume() {
     if (!datumPodnosenja) return
 
-    const d8 = addDays(datumPodnosenja, 8)
-    const d30 = addDays(datumPodnosenja, 30)
-
+    const d8 = mainSevenDays(datumPodnosenja);
+    const d30 = mainThirtyDays(datumPodnosenja);
+    
     setPravosnaznost8(format(d8, "dd.MM.yyyy"))
     setPravosnaznost30(format(d30, "dd.MM.yyyy"))
   }
@@ -71,8 +73,10 @@ export default function FormaPredmet() {
           </label>
           <input
             type="text"
-            placeholder="Unesite ime referenta"
-            className="mt-1 w-full rounded-md border-gray-300 shadow-sm p-2"
+            value={user.ime}
+            placeholder={user.ime}
+            className="mt-1 w-full rounded-md border-gray-300 shadow-sm text-gray-700 p-2"
+            readOnly
           />
         </div>
 
@@ -83,7 +87,8 @@ export default function FormaPredmet() {
           <input
             type="text"
             value={pravosnaznost8}
-            readOnly
+            onChange={(e) => setPravosnaznost8(e.target.value)}
+            placeholder="dd.mm.yyyy"
             className="mt-1 w-full rounded-md bg-gray-100 border-gray-300 shadow-sm p-2 text-gray-600"
           />
         </div>
@@ -95,7 +100,8 @@ export default function FormaPredmet() {
           <input
             type="text"
             value={pravosnaznost30}
-            readOnly
+            onChange={(e) => setPravosnaznost30(e.target.value)}
+            placeholder="dd.mm.yyyy"
             className="mt-1 w-full rounded-md bg-gray-100 border-gray-300 shadow-sm p-2 text-gray-600"
           />
         </div>

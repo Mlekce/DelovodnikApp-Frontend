@@ -45,7 +45,7 @@ export default function Register() {
     let obradjenEmail = validateEmail(email);
     let passwordTest = validatePasword(password, cpassword);
 
-    if (!passwordTest) {
+    if (!passwordTest || !obradjenEmail) {
       return false
     }
     else {

@@ -13,7 +13,7 @@ export default function Login() {
     const lozinka = formData.get("password");
 
     async function posaljiNaBekend(email, lozinka) {
-      const url = "http://localhost:5173/api/login";
+      const url = "http://localhost:4000/api/login";
       try {
         const options = {
           method: "POST",
@@ -41,11 +41,10 @@ export default function Login() {
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("korisnik", JSON.stringify(data.korisnik));
-
       setPoruka("Uspešno ste prijavljeni!");
 
       setTimeout(() => {
-        navigate("/dashboard");
+        navigate("/delovodnik");
       }, 2000);
     });
   }
