@@ -9,19 +9,92 @@ import { mainSevenDays, mainThirtyDays } from "../../public/scripts/vreme"
 registerLocale("sr", sr)
 
 export default function FormaPredmet() {
-  const [datumPodnosenja, setDatumPodnosenja] = useState(null)
-  const [pravosnaznost8, setPravosnaznost8] = useState("")
-  const [pravosnaznost30, setPravosnaznost30] = useState("")
+  const [datumPodnosenja, setDatumPodnosenja] = useState(null);
+  const [pravosnaznost8, setPravosnaznost8] = useState("");
+  const [pravosnaznost30, setPravosnaznost30] = useState("");
+  const [poruka, setPoruka] = useState("");
   const user = JSON.parse(localStorage.getItem("korisnik"));
+
 
   function izracunajDatume() {
     if (!datumPodnosenja) return
 
     const d8 = mainSevenDays(datumPodnosenja);
     const d30 = mainThirtyDays(datumPodnosenja);
-    
+
     setPravosnaznost8(format(d8, "dd.MM.yyyy"))
     setPravosnaznost30(format(d30, "dd.MM.yyyy"))
+  }
+
+  function posaljiPodatke(e) {
+    e.preventDefault();
+
+    const forma = document.getElementById("unosForma");
+    const formData = new FormData(forma);
+    const stranka = formData.get("stranka");
+    const brPredmeta = formData.get("brpredmeta");
+    const dPodnosenja = datumPodnosenja
+      ? format(datumPodnosenja, "yyyy-MM-dd")
+      : "";
+    const referent = formData.get("referent");
+    const d8 = formData.get("pravosnaznost8");
+    const d30 = formData.get("pravosnaznost30");
+    const dPravosnaznosti = d8 ? format(d8, "yyyy-MM-dd") : format(d30, "yyyy-MM-dd");
+
+    if (d30 && d8) {
+      setPoruka("Korisnička greška: Očisti jedno polje pravosnažnosti!");
+      return;
+    }
+
+    if (!stranka || !brPredmeta || !dPodnosenja || !referent || !dPravosnaznosti) {
+      setPoruka("Korisnička greška: Sva polja moraju biti popunjena!");
+      return;
+    }
+
+    async function posaljiNaBackend() {
+      const url = "http://localhost:4000/api/predmet";
+      const opcije = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify({
+          user: JSON.parse(localStorage.getItem("korisnik")),
+          predmet: {
+            stranka,
+            broj_predmeta: brPredmeta,
+            referent,
+            datum_podnosenja: dPodnosenja,
+            datum_pravosnaznosti: dPravosnaznosti,
+            napomena: null,
+            status: "u_izradi"
+          }
+        })
+      };
+
+      try {
+        const rezultat = await fetch(url, opcije);
+        const podaci = await rezultat.json();
+        console.log(podaci)
+        if (rezultat.status === 400) {
+          setPoruka(podaci.poruka);
+          return;
+        }
+
+        if (rezultat.status === 201) {
+          setPoruka("Predmet uspešno dodat.");
+          forma.reset();
+          setDatumPodnosenja(null);
+          setPravosnaznost8("");
+          setPravosnaznost30("");
+        }
+      } catch (error) {
+        console.error(error.message);
+        setPoruka("Aplikativna greška: predmet nije dodat!");
+      }
+    }
+    posaljiNaBackend(stranka, brPredmeta, referent, dPodnosenja, dPravosnaznosti);
   }
 
   return (
@@ -30,7 +103,10 @@ export default function FormaPredmet() {
         UNOS PREDMETA
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <form className="grid grid-cols-1 md:grid-cols-2 gap-4" id="unosForma">
+        <div className="col-span-1 md:col-span-2 text-center text-red-500">
+          {poruka}
+        </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
             Ime i prezime
@@ -38,6 +114,7 @@ export default function FormaPredmet() {
           <input
             type="text"
             placeholder="Petar Petrović"
+            name="stranka"
             className="mt-1 w-full rounded-md border-gray-300 shadow-sm p-2"
           />
         </div>
@@ -48,6 +125,7 @@ export default function FormaPredmet() {
           </label>
           <input
             type="text"
+            name="brpredmeta"
             placeholder="RGZ-1234/2024"
             className="mt-1 w-full rounded-md border-gray-300 shadow-sm p-2"
           />
@@ -62,6 +140,7 @@ export default function FormaPredmet() {
             onChange={(date) => setDatumPodnosenja(date)}
             dateFormat="dd.MM.yyyy"
             locale="sr"
+            name="dpodnosenja"
             placeholderText="Izaberi datum"
             className="mt-1 w-full rounded-md border-gray-300 shadow-sm text-gray-700 p-2"
           />
@@ -75,7 +154,8 @@ export default function FormaPredmet() {
             type="text"
             value={user.ime}
             placeholder={user.ime}
-            className="mt-1 w-full rounded-md border-gray-300 shadow-sm text-gray-700 p-2"
+            name="referent"
+            className="mt-1 w-full rounded-md bg-gray-100 border-gray-300 shadow-sm p-2 text-gray-600"
             readOnly
           />
         </div>
@@ -87,9 +167,10 @@ export default function FormaPredmet() {
           <input
             type="text"
             value={pravosnaznost8}
+            name="pravosnaznost8"
             onChange={(e) => setPravosnaznost8(e.target.value)}
             placeholder="dd.mm.yyyy"
-            className="mt-1 w-full rounded-md bg-gray-100 border-gray-300 shadow-sm p-2 text-gray-600"
+            className="mt-1 w-full rounded-md border-gray-300 shadow-sm text-gray-700 p-2"
           />
         </div>
 
@@ -100,12 +181,13 @@ export default function FormaPredmet() {
           <input
             type="text"
             value={pravosnaznost30}
+            name="pravosnaznost30"
             onChange={(e) => setPravosnaznost30(e.target.value)}
             placeholder="dd.mm.yyyy"
-            className="mt-1 w-full rounded-md bg-gray-100 border-gray-300 shadow-sm p-2 text-gray-600"
+            className="mt-1 w-full rounded-md border-gray-300 shadow-sm text-gray-700 p-2"
           />
         </div>
-      </div>
+      </form>
 
       <div className="flex justify-between gap-4">
         <button
@@ -118,6 +200,7 @@ export default function FormaPredmet() {
         <button
           type="submit"
           className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition"
+          onClick={posaljiPodatke}
         >
           Sačuvaj predmet
         </button>
