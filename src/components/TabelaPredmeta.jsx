@@ -4,12 +4,13 @@ import { parse, format, isValid } from "date-fns";
 export default function TabelaPredmeta() {
     const [predmeti, setPredmeti] = useState([]);
     //const [poruka, setPoruka] = useState("");
-    const [prikaz, setPrikaz] = useState(5);
+    const [prikaz, setPrikaz] = useState(6);
     let brojStranica = Math.ceil(predmeti.length / prikaz);
     let [predmetiZaPrikaz, setPredmetiZaPrikaz] = useState([]);
+    let [x, setX] = useState([1, prikaz]);
     useEffect(() => {
         povuciPodatke()
-        setPredmetiZaPrikaz(predmeti.slice(0, prikaz))
+
     }, [])
 
     useEffect(() => {
@@ -35,6 +36,8 @@ export default function TabelaPredmeta() {
                 }
                 let data = await response.json();
                 setPredmeti(data)
+                let podaci = data.slice(0, prikaz);
+                setPredmetiZaPrikaz(podaci)
                 return true
             } catch (error) {
                 console.error(error.message)
@@ -50,6 +53,7 @@ export default function TabelaPredmeta() {
         let end = i * prikaz;
         let predmetiPrikaz = predmeti.slice(start, end);
         setPredmetiZaPrikaz(predmetiPrikaz)
+        setX([start, end])
     }
 
     return (
@@ -116,25 +120,25 @@ export default function TabelaPredmeta() {
                         </thead>
                         <tbody>
                             {
-                            predmetiZaPrikaz.map((predmet) => (
-                            <tr className="hover:bg-slate-50 border-b border-slate-200">
-                                <td className="p-4 py-5">
-                                    <p className="block font-semibold text-sm text-slate-800">{predmet.broj_predmeta}</p>
-                                </td>
-                                <td className="p-4 py-5">
-                                    <p className="text-sm text-slate-500">{predmet.ime_stranke}</p>
-                                </td>
-                                <td className="p-4 py-5">
-                                    <p className="text-sm text-slate-500">{predmet.referent}</p>
-                                </td>
-                                <td className="p-4 py-5">
-                                    <p className="text-sm text-slate-500">{format(predmet.datum_podnosenja, "dd.MM.yyyy")}</p>
-                                </td>
-                                <td className="p-4 py-5">
-                                    <p className="text-sm text-slate-500">{format(predmet.datum_pravosnaznosti, "dd.MM.yyyy")}</p>
-                                </td>
-                            </tr>
-                            ))                                
+                                predmetiZaPrikaz.map((predmet) => (
+                                    <tr className="hover:bg-slate-50 border-b border-slate-200">
+                                        <td className="p-4 py-5">
+                                            <p className="block font-semibold text-sm text-slate-800">{predmet.broj_predmeta}</p>
+                                        </td>
+                                        <td className="p-4 py-5">
+                                            <p className="text-sm text-slate-500">{predmet.ime_stranke}</p>
+                                        </td>
+                                        <td className="p-4 py-5">
+                                            <p className="text-sm text-slate-500">{predmet.referent}</p>
+                                        </td>
+                                        <td className="p-4 py-5">
+                                            <p className="text-sm text-slate-500">{format(predmet.datum_podnosenja, "dd.MM.yyyy")}</p>
+                                        </td>
+                                        <td className="p-4 py-5">
+                                            <p className="text-sm text-slate-500">{format(predmet.datum_pravosnaznosti, "dd.MM.yyyy")}</p>
+                                        </td>
+                                    </tr>
+                                ))
                             }
 
 
@@ -144,7 +148,7 @@ export default function TabelaPredmeta() {
 
                     <div className="flex justify-between items-center px-4 py-3">
                         <div className="text-sm text-slate-500">
-                            Showing <b>1-5</b> of 45
+                            Showing <b>{`${x[0]}-${x[1]}`}</b> of {predmeti.length}
                         </div>
                         <div className="flex space-x-1">
                             <button className="px-3 py-1 min-w-9 min-h-9 text-sm font-normal text-slate-500 bg-white border border-slate-200 rounded hover:bg-slate-50 hover:border-slate-400 transition duration-200 ease">
