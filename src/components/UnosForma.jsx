@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import DatePicker, { registerLocale } from "react-datepicker"
 import { sr } from "date-fns/locale"
-import { addDays, format } from "date-fns"
+import { parse, format, isValid } from "date-fns";
 import "react-datepicker/dist/react-datepicker.css"
 import "../custom-datepicker.css" // (vidi ispod)
 import { mainSevenDays, mainThirtyDays } from "../../public/scripts/vreme"
@@ -41,13 +41,25 @@ export default function FormaPredmet() {
     const d30 = formData.get("pravosnaznost30");
     let dPravosnaznosti = "";
 
-    if (d8 && !d30) {
-      dPravosnaznosti = format(new Date(d8), "yyyy-MM-dd");
-    } else if (!d8 && d30) {
-      dPravosnaznosti = format(new Date(d30), "yyyy-MM-dd");
-    } else if (d8 && d30) {
+    if (d8 && d30) {
       setPoruka("Korisnička greška: Obrisite jedno od polja pravosnažnosti!");
       return;
+    }
+
+    if (d8) {
+      const parsed = parse(d8, "dd.MM.yyyy", new Date());
+      if (!isValid(parsed)) {
+        setPoruka("Nevažeći datum pravosnažnosti (8 dana).");
+        return;
+      }
+      dPravosnaznosti = format(parsed, "yyyy-MM-dd");
+    } else if (d30) {
+      const parsed = parse(d30, "dd.MM.yyyy", new Date());
+      if (!isValid(parsed)) {
+        setPoruka("Nevažeći datum pravosnažnosti (30 dana).");
+        return;
+      }
+      dPravosnaznosti = format(parsed, "yyyy-MM-dd");
     } else {
       setPoruka("Morate uneti bar jedan datum pravosnažnosti!");
       return;
@@ -83,7 +95,7 @@ export default function FormaPredmet() {
       try {
         const rezultat = await fetch(url, opcije);
         const podaci = await rezultat.json();
-        console.log(podaci)
+        console.log(podaci);
         if (rezultat.status === 400) {
           setPoruka(podaci.poruka);
           return;
@@ -101,8 +113,10 @@ export default function FormaPredmet() {
         setPoruka("Aplikativna greška: predmet nije dodat!");
       }
     }
-    posaljiNaBackend(stranka, brPredmeta, referent, dPodnosenja, dPravosnaznosti);
+
+    posaljiNaBackend();
   }
+
 
   return (
     <div className="max-w-[900px] mx-auto p-6 mt-6 mb-6 bg-white rounded-xl shadow-md space-y-6">

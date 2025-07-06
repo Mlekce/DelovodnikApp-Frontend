@@ -1,6 +1,59 @@
+import { useState, useEffect } from "react";
+import { parse, format, isValid } from "date-fns";
+
 export default function TabelaPredmeta() {
+    const [predmeti, setPredmeti] = useState([]);
+    //const [poruka, setPoruka] = useState("");
+    const [prikaz, setPrikaz] = useState(5);
+    let brojStranica = Math.ceil(predmeti.length / prikaz);
+    let [predmetiZaPrikaz, setPredmetiZaPrikaz] = useState([]);
+    useEffect(() => {
+        povuciPodatke()
+        setPredmetiZaPrikaz(predmeti.slice(0, prikaz))
+    }, [])
+
+    useEffect(() => {
+
+    }, [prikaz]);
+
+    function povuciPodatke() {
+        let url = "http://localhost:4000/api/predmet";
+        posaljiNaBackend(url);
+        async function posaljiNaBackend(url) {
+            let options = {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                }
+            }
+            try {
+                let response = await fetch(url, options);
+                if (!response.ok) {
+                    setPoruka("Greska: Greska prilikom preuzimanja podataka sa servera!")
+                    return false
+                }
+                let data = await response.json();
+                setPredmeti(data)
+                return true
+            } catch (error) {
+                console.error(error.message)
+                setPoruka("Greska: Greska prilikom preuzimanja podataka sa servera!")
+                return
+            }
+        }
+    }
+
+    function prikaziSledece(e) {
+        let i = Number(e.currentTarget.textContent);
+        let start = (i - 1) * prikaz;
+        let end = i * prikaz;
+        let predmetiPrikaz = predmeti.slice(start, end);
+        setPredmetiZaPrikaz(predmetiPrikaz)
+    }
+
     return (
-        <>  
+        <>
             <div className="max-w-[1200px] mx-auto mt-10 mb-10">
                 <div className="w-full flex justify-between items-center mb-3 mt-1 pl-3">
                     <div>
@@ -8,7 +61,7 @@ export default function TabelaPredmeta() {
                         <p className="text-slate-500">Spisak svih unetih predmeta.</p>
                     </div>
                     <div className="ml-3">
-                        
+
                         <div className="w-full max-w-sm min-w-[200px] relative">
                             {/*  
                             <div className="relative">
@@ -62,74 +115,30 @@ export default function TabelaPredmeta() {
                             </tr>
                         </thead>
                         <tbody>
+                            {
+                            predmetiZaPrikaz.map((predmet) => (
                             <tr className="hover:bg-slate-50 border-b border-slate-200">
                                 <td className="p-4 py-5">
-                                    <p className="block font-semibold text-sm text-slate-800">952-02-4-013-12335/2025</p>
+                                    <p className="block font-semibold text-sm text-slate-800">{predmet.broj_predmeta}</p>
                                 </td>
                                 <td className="p-4 py-5">
-                                    <p className="text-sm text-slate-500">John Doe</p>
+                                    <p className="text-sm text-slate-500">{predmet.ime_stranke}</p>
                                 </td>
                                 <td className="p-4 py-5">
-                                    <p className="text-sm text-slate-500">Zorica Jankovic</p>
+                                    <p className="text-sm text-slate-500">{predmet.referent}</p>
                                 </td>
                                 <td className="p-4 py-5">
-                                    <p className="text-sm text-slate-500">01.02.2025</p>
+                                    <p className="text-sm text-slate-500">{format(predmet.datum_podnosenja, "dd.MM.yyyy")}</p>
                                 </td>
                                 <td className="p-4 py-5">
-                                    <p className="text-sm text-slate-500">10.02.2025</p>
+                                    <p className="text-sm text-slate-500">{format(predmet.datum_pravosnaznosti, "dd.MM.yyyy")}</p>
                                 </td>
                             </tr>
-                            <tr className="hover:bg-slate-50 border-b border-slate-200">
-                                <td className="p-4 py-5">
-                                    <p className="block font-semibold text-sm text-slate-800">952-02-6-005-24/2024</p>
-                                </td>
-                                <td className="p-4 py-5">
-                                    <p className="text-sm text-slate-500">Jane Smith</p>
-                                </td>
-                                <td className="p-4 py-5">
-                                    <p className="text-sm text-slate-500">Petar Petrovic</p>
-                                </td>
-                                <td className="p-4 py-5">
-                                    <p className="text-sm text-slate-500">08.04.2024</p>
-                                </td>
-                                <td className="p-4 py-5">
-                                    <p className="text-sm text-slate-500">09.05.2024</p>
-                                </td>
-                            </tr>
-                            <tr className="hover:bg-slate-50 border-b border-slate-200">
-                                <td className="p-4 py-5">
-                                    <p className="block font-semibold text-sm text-slate-800">951-666-3/2025</p>
-                                </td>
-                                <td className="p-4 py-5">
-                                    <p className="text-sm text-slate-500">Acme Corp</p>
-                                </td>
-                                <td className="p-4 py-5">
-                                    <p className="text-sm text-slate-500">Dalibor Janjic</p>
-                                </td>
-                                <td className="p-4 py-5">
-                                    <p className="text-sm text-slate-500">06.06.2025</p>
-                                </td>
-                                <td className="p-4 py-5">
-                                    <p className="text-sm text-slate-500">15.06.2025</p>
-                                </td>
-                            </tr>
-                            <tr className="hover:bg-slate-50 border-b border-slate-200">
-                                <td className="p-4 py-5">
-                                    <p className="block font-semibold text-sm text-slate-800">952-02-20-011-36478/2018</p>
-                                </td>
-                                <td className="p-4 py-5">
-                                    <p className="text-sm text-slate-500">Mihaela Swartz Bebic</p>
-                                </td>
-                                <td className="p-4 py-5">
-                                    <p className="text-sm text-slate-500">Ana Rakic</p>
-                                </td>
-                                <td className="p-4 py-5">
-                                    <p className="text-sm text-slate-500">27.06.2025</p>
-                                </td>
-                                <td className="p-4 py-5">
-                                    <p className="text-sm text-slate-500">01.08.2025</p>
-                                </td>
-                            </tr>
+                            ))                                
+                            }
+
+
+
                         </tbody>
                     </table>
 
@@ -141,15 +150,10 @@ export default function TabelaPredmeta() {
                             <button className="px-3 py-1 min-w-9 min-h-9 text-sm font-normal text-slate-500 bg-white border border-slate-200 rounded hover:bg-slate-50 hover:border-slate-400 transition duration-200 ease">
                                 Prethodna
                             </button>
-                            <button className="px-3 py-1 min-w-9 min-h-9 text-sm font-normal text-white bg-slate-800 border border-slate-800 rounded hover:bg-slate-600 hover:border-slate-600 transition duration-200 ease">
-                                1
-                            </button>
-                            <button className="px-3 py-1 min-w-9 min-h-9 text-sm font-normal text-slate-500 bg-white border border-slate-200 rounded hover:bg-slate-50 hover:border-slate-400 transition duration-200 ease">
-                                2
-                            </button>
-                            <button className="px-3 py-1 min-w-9 min-h-9 text-sm font-normal text-slate-500 bg-white border border-slate-200 rounded hover:bg-slate-50 hover:border-slate-400 transition duration-200 ease">
-                                3
-                            </button>
+                            {Array.from({ length: brojStranica }, (_, i) => (
+                                <button onClick={prikaziSledece} className="px-3 py-1 min-w-9 min-h-9 text-sm font-normal text-slate-500 bg-white border border-slate-200 rounded hover:bg-slate-50 hover:border-slate-400 transition duration-200 ease" key={i + 1}>{i + 1}</button>
+                            ))}
+
                             <button className="px-3 py-1 min-w-9 min-h-9 text-sm font-normal text-slate-500 bg-white border border-slate-200 rounded hover:bg-slate-50 hover:border-slate-400 transition duration-200 ease">
                                 Sledeca
                             </button>
