@@ -1,24 +1,20 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import DatePicker, { registerLocale } from "react-datepicker"
 import { sr } from "date-fns/locale"
 import { parse, format, isValid } from "date-fns";
 import "react-datepicker/dist/react-datepicker.css"
 import "../custom-datepicker.css" // (vidi ispod)
 import { mainSevenDays, mainThirtyDays } from "../../public/scripts/vreme"
-import TabelaPredmeta from "./TabelaPredmeta";
+
 registerLocale("sr", sr)
 
 export default function FormaPredmet() {
   const [datumPodnosenja, setDatumPodnosenja] = useState(null);
   const [pravosnaznost8, setPravosnaznost8] = useState("");
   const [pravosnaznost30, setPravosnaznost30] = useState("");
-  const [predmeti, setPredmeti] = useState([]);
   const [poruka, setPoruka] = useState("");
   const user = JSON.parse(localStorage.getItem("korisnik"));
 
-  useEffect(() => {
-    povuciPodatke()
-  }, [])
 
   function izracunajDatume() {
     if (!datumPodnosenja) return
@@ -119,32 +115,8 @@ export default function FormaPredmet() {
     posaljiNaBackend();
   }
 
-  async function povuciPodatke() {
-  let url = "http://localhost:4000/api/predmet";
-  let options = {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${localStorage.getItem("token")}`
-    }
-  }
-
-  try {
-    let response = await fetch(url, options);
-    if (!response.ok) {
-      setPoruka("Greška: Neuspešno preuzimanje podataka!");
-      return;
-    }
-    let data = await response.json();
-    setPredmeti(data);
-  } catch (error) {
-    console.error(error.message);
-    setPoruka("Greška: Server nedostupan!");
-  }
-}
 
   return (
-    <>
     <div className="max-w-[900px] mx-auto p-6 mt-6 mb-6 bg-white rounded-xl shadow-md space-y-6">
       <h2 className="text-lg font-semibold text-gray-800 border-b pb-2">
         UNOS PREDMETA
@@ -253,9 +225,5 @@ export default function FormaPredmet() {
         </button>
       </div>
     </div>
-    { !predmeti && <TabelaPredmeta predmeti={[]} duzina={0}/>}
-    { predmeti && <TabelaPredmeta predmeti={predmeti} duzina={predmeti.length}/>}
-    
-    </>
   )
 }
