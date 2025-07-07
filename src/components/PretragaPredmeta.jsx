@@ -17,13 +17,13 @@ export default function PretragaPredmeta() {
       <TabelaPredmeta />
     </>
   )
-
-
 }
 
 function Pracenje() {
   const [datumPodnosenja, setDatumPodnosenja] = useState(null)
-  const [datumPravosnaznosti, setDatumPravosnaznosti] = useState(null)
+  const [datumPravosnaznosti, setDatumPravosnaznosti] = useState(format(Date.now(), "dd.MM.yyyy"))
+  const podaciOKorisniku = JSON.parse(localStorage.getItem("korisnik"));
+
   return (
     <div className="max-w-[900px] mx-auto p-6 mt-6 mb-6 bg-white rounded-xl shadow-md space-y-6">
       <h2 className="text-lg font-semibold text-gray-800 border-b pb-2">
@@ -73,8 +73,10 @@ function Pracenje() {
           </label>
           <input
             type="text"
-            placeholder="Unesite ime referenta"
-            className="mt-1 w-full rounded-md border-gray-300 shadow-sm p-2"
+            readOnly
+            value={podaciOKorisniku.ime}
+            placeholder={podaciOKorisniku.ime}
+            className="mt-1 w-full rounded-md bg-gray-100 border-gray-300 shadow-sm p-2 text-gray-600"
           />
         </div>
 
@@ -86,6 +88,7 @@ function Pracenje() {
             selected={datumPravosnaznosti}
             onChange={(date) => setDatumPravosnaznosti(date)}
             dateFormat="dd.MM.yyyy"
+            value={datumPravosnaznosti}
             locale="sr"
             placeholderText="Izaberi datum"
             className="mt-1 w-full rounded-md border-gray-300 shadow-sm text-gray-700 p-2"

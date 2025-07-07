@@ -120,8 +120,8 @@ export default function TabelaPredmeta() {
                         </thead>
                         <tbody>
                             {
-                                predmetiZaPrikaz.map((predmet) => (
-                                    <tr className="hover:bg-slate-50 border-b border-slate-200">
+                                predmetiZaPrikaz.map((predmet, index) => (
+                                    <tr className="hover:bg-slate-50 border-b border-slate-200" key={index}>
                                         <td className="p-4 py-5">
                                             <p className="block font-semibold text-sm text-slate-800">{predmet.broj_predmeta}</p>
                                         </td>
