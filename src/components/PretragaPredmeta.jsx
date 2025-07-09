@@ -35,7 +35,7 @@ function Pracenje() {
     const body = {
       predmet: {
         broj_predmeta: predmet || null,
-        stranka: stranka || null,
+        ime_stranke: stranka || null,
         referent: referent || null,
         datum_podnosenja: datumPodnosenja
           ? format(datumPodnosenja, "yyyy-MM-dd")
@@ -63,13 +63,15 @@ function Pracenje() {
 
       const data = await response.json();
 
-      if (Array.isArray(data)) {
+      if(data.length === 0){
+        setPredmeti([])
+        setPoruka("Nema stavki za prikaz!")
+      }
+      else {
         setPredmeti(data);
         setPoruka("");
-      } else {
-        setPoruka("Greška u parsovanju odgovora!");
-        setPredmeti([]);
       }
+      console.log(predmeti)
     } catch (error) {
       console.error("Greška u pretrazi:", error);
       setPoruka("Neočekivana greška!");
@@ -93,7 +95,7 @@ function Pracenje() {
         >
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Ime i prezime
+              Ime i prezime stranke
             </label>
             <input
               type="text"

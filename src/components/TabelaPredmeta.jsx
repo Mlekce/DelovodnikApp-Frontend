@@ -12,6 +12,8 @@ export default function TabelaPredmeta({ predmeti, duzina }) {
         const kraj = stranica * prikaz;
         if (duzina > 0) {
             setPrikazaniPredmeti(predmeti.slice(pocetak, kraj));
+        } else {
+            setPrikazaniPredmeti([])
         }
     }, [predmeti, stranica]);
 
