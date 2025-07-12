@@ -19,9 +19,6 @@ function Nalog() {
     const [newPassword, setNewPassword] = useState("");
     const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
-    const [Avatar, setAvatar] = useState(korisnik.avatar);
-    const [sluzba, setSluzba] = useState(korisnik.sluzba);
-
     function resetPass() {
         const forma = document.getElementById("reset-form");
         return
@@ -34,10 +31,12 @@ function Nalog() {
         let slzba = formData.get("sluzba");
         let opcije;
 
-        if (!slzba && !avtr) {
+        if (!slzba && (!avtr.name || avtr.size === 0)) {
             setPoruka("Niste nista izmenili od podataka.");
             return false;
-        } else if (!slzba && avtr) {
+        }
+
+        if ((avtr && avtr.name !== "" && avtr.size !== 0)) {
             opcije = {
                 method: "POST",
                 headers: {
@@ -56,18 +55,42 @@ function Nalog() {
                 localStorage.setItem("korisnik", JSON.stringify(data.korisnik))
                 setKorisnik(JSON.parse(localStorage.getItem("korisnik")));
                 setPoruka(data.poruka);
-                return true
             } catch (error) {
-
-            }
-        } else {
-            opcije = {
-                method: "POST",
-                body: {
-                    sluzba: slzba
-                }
+                console.log(error.message);
+                setPoruka(`Doslo je do greske: ${error.message}`);
+                return false;
             }
         }
+        if (slzba) {
+            opcije = {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    sluzba: slzba
+                })
+            }
+            const url = "http://localhost:4000/api/users/sluzba";
+            try {
+                let response = await fetch(url, opcije);
+                if (!response.ok) {
+                    setPoruka("Greska pri izmeni podataka o sluzbi!");
+                    return false;
+                }
+                let data = await response.json();
+                localStorage.setItem("korisnik", JSON.stringify(data.korisnik))
+                setKorisnik(JSON.parse(localStorage.getItem("korisnik")));
+                setPoruka(data.poruka);
+            } catch (error) {
+                console.log(error.message);
+                setPoruka(`Doslo je do greske: ${error.message}`);
+                return false;
+            }
+        }
+        forma.reset();
+        return true;
     }
 
 
@@ -90,12 +113,12 @@ function Nalog() {
                     </div>
                 </div>
                 <p>{poruka}</p>
-                <form className="grid grid-cols-1 md:grid-cols-2 gap-4" 
-                id="nalog-form" 
-                encType="multipart/form-data" 
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    posaljiPodatkeONalogu();
+                <form className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                    id="nalog-form"
+                    encType="multipart/form-data"
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        posaljiPodatkeONalogu();
                     }}>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">
@@ -114,9 +137,8 @@ function Nalog() {
                         </label>
                         <input
                             type="text"
-                            placeholder="RGZ Beograd"
+                            placeholder={korisnik.sluzba}
                             name="sluzba"
-                            onChange={(e) => setSluzba(e.target.value)}
                             className="mt-1 w-full rounded-md border-gray-300 shadow-sm p-2"
                         />
                     </div>
@@ -160,7 +182,6 @@ function Nalog() {
                         <input
                             type="file"
                             name="avatar"
-                            onChange={(e) => setAvatar(e.target.value)}
                             placeholder={korisnik.avatar}
                             className="mt-1 w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-100"
                         />
