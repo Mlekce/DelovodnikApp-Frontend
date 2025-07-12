@@ -12,8 +12,8 @@ export default function KomponentaNalog() {
 }
 
 function Nalog() {
-    let korisnik = JSON.parse(localStorage.getItem("korisnik"));
     const [poruka, setPoruka] = useState("");
+    const [korisnik, setKorisnik] = useState(JSON.parse(localStorage.getItem("korisnik")));
 
     const [oldPassword, setOldPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
@@ -53,6 +53,8 @@ function Nalog() {
                     return false;
                 }
                 let data = await response.json();
+                localStorage.setItem("korisnik", JSON.stringify(data.korisnik))
+                setKorisnik(JSON.parse(localStorage.getItem("korisnik")));
                 setPoruka(data.poruka);
                 return true
             } catch (error) {
