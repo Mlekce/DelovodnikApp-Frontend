@@ -1,5 +1,6 @@
 import Header from "./Header";
 import avatar from "../assets/person.png"
+import {format} from "date-fns";
 import { useState } from "react";
 
 export default function KomponentaNalog() {
@@ -159,7 +160,7 @@ function Nalog() {
                         <p className="text-gray-500">{korisnik.email}</p>
                     </div>
                 </div>
-                <p>{poruka}</p>
+                {poruka && poruka !== "" && <p className="bg-red-500 text-white text-center uppercase;">Status: {poruka}</p>}
                 <form className="grid grid-cols-1 md:grid-cols-2 gap-4"
                     id="nalog-form"
                     encType="multipart/form-data"
@@ -180,7 +181,7 @@ function Nalog() {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">
-                            Služba
+                            Služba <span className="text-red-500">*</span>
                         </label>
                         <input
                             type="text"
@@ -216,15 +217,15 @@ function Nalog() {
                             Datum registracije
                         </label>
                         <input
-                            type="date"
+                            type="text"
                             disabled
-                            placeholder={korisnik.datum_registracije}
+                            placeholder={format(korisnik.datum_registracije.split("T")[0], "dd.MM.yyyy")}
                             className="mt-1 w-full rounded-md border-gray-300 shadow-sm p-2"
                         />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">
-                            Zakaci fajl (avatar)
+                            Zakaci fajl (avatar) <span className="text-red-500">*</span>
                         </label>
                         <input
                             type="file"
@@ -249,7 +250,7 @@ function Nalog() {
                 <form className="grid grid-cols-1 gap-4" id="reset-form" onSubmit={(e) => { e.preventDefault(); resetPass() }}>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">
-                            Stara lozinka
+                            Stara lozinka <span className="text-red-500">*</span>
                         </label>
                         <input
                             type="password"
@@ -260,7 +261,7 @@ function Nalog() {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">
-                            Nova lozinka
+                            Nova lozinka <span className="text-red-500">*</span>
                         </label>
                         <input
                             type="password"
@@ -271,7 +272,7 @@ function Nalog() {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">
-                            Potvrdi novu lozinku
+                            Potvrdi novu lozinku <span className="text-red-500">*</span>
                         </label>
                         <input
                             type="password"
