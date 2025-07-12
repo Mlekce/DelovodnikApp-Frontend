@@ -13,15 +13,63 @@ export default function KomponentaNalog() {
 
 function Nalog() {
     const [poruka, setPoruka] = useState("");
+    const [resetPoruka, setResetPoruka] = useState("");
     const [korisnik, setKorisnik] = useState(JSON.parse(localStorage.getItem("korisnik")));
 
-    const [oldPassword, setOldPassword] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [confirmNewPassword, setConfirmNewPassword] = useState("");
-
-    function resetPass() {
+    async function resetPass() {
         const forma = document.getElementById("reset-form");
-        return
+        const formData = new FormData(forma);
+        let staraLozinka = formData.get("lozinka-st");
+        let novaLozinka = formData.get("lozinka-n");
+        let potvrdiNovuLozinku = formData.get("lozinka-np");
+
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+        novaLozinka = novaLozinka.trim();
+        staraLozinka = staraLozinka.trim();
+
+        if (!staraLozinka || !novaLozinka || !potvrdiNovuLozinku) {
+            setResetPoruka("Sva polja moraju biti popunjena!");
+            return false;
+        }
+
+        if (novaLozinka !== potvrdiNovuLozinku) {
+            setResetPoruka("Polja nove lozinke se ne poklapaju!");
+            return false;
+        }
+
+        if (novaLozinka === staraLozinka) {
+            setResetPoruka("Nova lozinka i stara lozinka se podudaraju.");
+            return false;
+        }
+
+        if (!regex.test(novaLozinka)) {
+            setResetPoruka("Nova lozinka na ispunjava kompleksnost");
+            return false;
+        }
+
+        try {
+            let opcije = {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    staraLozinka,
+                    novaLozinka
+                })
+            }
+            const url = "http://localhost:4000/api/users/password";
+            const response = await fetch(url, opcije);
+            const data = await response.json();
+            setResetPoruka(data.poruka);
+        } catch (error) {
+            console.log(error.message);
+            setResetPoruka(`Doslo je do greske: ${error.message}`);
+            return false;
+        }
+        forma.reset();
+        return true
     }
 
     async function posaljiPodatkeONalogu() {
@@ -92,7 +140,6 @@ function Nalog() {
         forma.reset();
         return true;
     }
-
 
     return (
         <>
@@ -197,7 +244,9 @@ function Nalog() {
                 <h3 className="text-lg font-semibold border-b pt-4">
                     Resetuj lozinku
                 </h3>
-                <div className="grid grid-cols-1 gap-4">
+                {resetPoruka === "Uspesno zamenjena lozinka!" && <p className="bg-green-600 text-white text-center uppercase;">Status: {resetPoruka}</p>}
+                {resetPoruka && resetPoruka !== "Uspesno zamenjena lozinka!" && <p className="bg-red-500 text-white text-center uppercase;">Status: {resetPoruka}</p>}
+                <form className="grid grid-cols-1 gap-4" id="reset-form" onSubmit={(e) => { e.preventDefault(); resetPass() }}>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">
                             Stara lozinka
@@ -205,7 +254,6 @@ function Nalog() {
                         <input
                             type="password"
                             name="lozinka-st"
-                            onChange={(e) => { setOldPassword(e.target.value) }}
                             placeholder="Stara lozinka"
                             className="mt-1 w-[418px] rounded-md border-gray-300 shadow-sm p-2"
                         />
@@ -217,7 +265,6 @@ function Nalog() {
                         <input
                             type="password"
                             name="lozinka-n"
-                            onChange={(e) => { setNewPassword(e.target.value) }}
                             placeholder="Nova lozinka"
                             className="mt-1 w-[418px] rounded-md border-gray-300 shadow-sm p-2"
                         />
@@ -229,17 +276,17 @@ function Nalog() {
                         <input
                             type="password"
                             name="lozinka-np"
-                            onChange={(e) => { setConfirmNewPassword(e.target.value) }}
                             placeholder="potvrdi novu lozinku"
                             className="mt-1 w-[418px] rounded-md border-gray-300 shadow-sm p-2"
                         />
                     </div>
-                </div>
-                <div className="">
-                    <button id="reset-form" onClick={resetPass} type="submit" className="mt-4 bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition">
-                        Zameni lozinku
-                    </button>
-                </div>
+                    <div>
+                        <button type="submit" className="mt-4 bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition">
+                            Zameni lozinku
+                        </button>
+                    </div>
+                </form>
+
             </div>
         </>
     )
