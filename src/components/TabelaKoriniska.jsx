@@ -37,7 +37,8 @@ function TabelaKorisnika() {
 
     window.onclick = function(event) {
         let mod = document.getElementById("modal");
-        if (event.target == mod) {
+        let forma = document.getElementById("modal-form");
+        if (event.target == forma) {
         mod.classList.add("hidden");
   }
 }
@@ -213,18 +214,16 @@ function Modal() {
         mod.classList.add("hidden")
     }
 
-
-
     return (
-
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-10 hidden" id="modal">
         <div
-            className="fixed inset-0 z-50 grid place-content-center p-4 hidden"
+            className="fixed inset-0 z-50 grid place-content-center p-4"
             role="dialog"
             aria-modal="true"
             aria-labelledby="modalTitle"
-            id="modal"
+            id="modal-form"
         >
-            <div className="w-full max-w-lg min-w-md rounded-lg bg-slate-800 text-white p-6 shadow-lg">
+            <div className="w-full max-w-lg min-w-md rounded-lg bg-slate-800 text-white p-6 shadow-lg ">
                 <div className="flex items-start justify-between mb-6">
                     <h2 id="modalTitle" className="text-xl font-bold text-white sm:text-2xl">Dodaj korisnika</h2>
 
@@ -300,5 +299,6 @@ function Modal() {
                 </form>
             </div>
         </div>
+    </div>
     )
 }
