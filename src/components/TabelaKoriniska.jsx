@@ -1,6 +1,7 @@
-import Header from "./Header"
+import Header from "./Header";
+import { useEffect, useState } from "react";
 
-export default function Korisnici(){
+export default function Korisnici() {
     return (
         <>
             <Header />
@@ -10,7 +11,40 @@ export default function Korisnici(){
 }
 
 function TabelaKorisnika() {
-    return (<div className="max-w-[1200px] mx-auto">
+    const [listaKorisnika, setListaKorisnika] = useState({ sviKorisnici: [], brojKorisnika: 0 });
+
+    useEffect(() => {
+        getUsers()
+    }, []);
+
+    async function getUsers() {
+        let url = "http://localhost:4000/api/users";
+        let options = {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+        }
+        let response = await fetch(url, options);
+        let data = await response.json();
+        setListaKorisnika(data.poruka);
+    }
+
+    function otvoriModal(){
+        let mod = document.getElementById("modal");
+        mod.classList.remove("hidden");
+    }
+
+    window.onclick = function(event) {
+        let mod = document.getElementById("modal");
+        if (event.target == mod) {
+        mod.classList.add("hidden");
+  }
+}
+
+    return (
+    <>
+    <div className="max-w-[1200px] mx-auto">
         <div className="mt-10 relative flex flex-col w-full h-full text-slate-700 bg-white shadow-md rounded-xl bg-clip-border">
             <div className="relative mx-4 mt-4 overflow-hidden text-slate-700 bg-white rounded-none bg-clip-border">
                 <div className="flex items-center justify-between ">
@@ -25,6 +59,7 @@ function TabelaKorisnika() {
                             Vidi sve
                         </button>
                         <button
+                            onClick={otvoriModal}
                             className="flex select-none items-center gap-2 rounded bg-slate-800 py-2.5 px-4 text-xs font-semibold text-white shadow-md shadow-slate-900/10 transition-all hover:shadow-lg hover:shadow-slate-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                             type="button">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
@@ -37,8 +72,8 @@ function TabelaKorisnika() {
                         </button>
                     </div>
                 </div>
-
             </div>
+
             <div className="p-0 overflow-scroll">
                 <table className="w-full mt-4 text-left table-auto min-w-max">
                     <thead>
@@ -95,236 +130,56 @@ function TabelaKorisnika() {
                                 className="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
                                 <p
                                     className="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
-                                        Radnje
+                                    Radnje
                                 </p>
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td className="p-4 border-b border-slate-200">
-                                <div className="flex items-center gap-3">
-                                    <img src="https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-3.jpg"
-                                        alt="John Michael" className="relative inline-block h-9 w-9 !rounded-full object-cover object-center" />
-                                    <div className="flex flex-col">
-                                        <p className="text-sm font-semibold text-slate-700">
-                                            John Michael
+                        {listaKorisnika.sviKorisnici.length > 0 &&
+                            listaKorisnika.sviKorisnici.map((kor, i) => (
+                                <tr key={kor.id || i}>
+                                    <td className="p-4 border-b border-slate-200">
+                                        <div className="flex items-center gap-3">
+                                            <img src={`http://localhost:4000/avatars/${kor.avatar}`} alt={kor.ime}
+                                                className="relative inline-block h-9 w-9 !rounded-full object-cover object-center" />
+                                            <div className="flex flex-col">
+                                                <p className="text-sm font-semibold text-slate-700">{kor.ime}</p>
+                                                <p className="text-sm text-slate-500">{kor.email}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="p-4 border-b border-slate-200">
+                                        <p className="text-sm font-semibold text-slate-700">{kor.sluzba}</p>
+                                    </td>
+                                    <td className="p-4 border-b border-slate-200">
+                                        <div className="w-max">
+                                            <div className="relative grid items-center px-2 py-1 font-sans text-xs font-bold text-green-900 uppercase rounded-md select-none whitespace-nowrap bg-green-500/20">
+                                                <span>{kor.uloga}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="p-4 border-b border-slate-200">
+                                        <p className="text-sm text-slate-500">
+                                            {kor.datum_registracije ? kor.datum_registracije.split("T")[0] : "Nepoznat"}
                                         </p>
-                                        <p
-                                            className="text-sm text-slate-500">
-                                            john@creative-tim.com
-                                        </p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td className="p-4 border-b border-slate-200">
-                                <div className="flex flex-col">
-                                    <p className="text-sm font-semibold text-slate-700">
-                                        Manager
-                                    </p>
-                                    <p
-                                        className="text-sm text-slate-500">
-                                        Organization
-                                    </p>
-                                </div>
-                            </td>
-                            <td className="p-4 border-b border-slate-200">
-                                <div className="w-max">
-                                    <div
-                                        className="relative grid items-center px-2 py-1 font-sans text-xs font-bold text-green-900 uppercase rounded-md select-none whitespace-nowrap bg-green-500/20">
-                                        <span className="">online</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td className="p-4 border-b border-slate-200">
-                                <p className="text-sm text-slate-500">
-                                    23/04/18
-                                </p>
-                            </td>
-                            <td className="p-4 border-b border-slate-200">
-                                <button
-                                    className="relative h-10 max-h-[40px] w-10 max-w-[40px] select-none rounded-lg text-center align-middle font-sans text-xs font-medium uppercase text-slate-900 transition-all hover:bg-slate-900/10 active:bg-slate-900/20 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                                    type="button">
-                                    <span className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
-                                            className="w-4 h-4">
-                                            <path
-                                                d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32L19.513 8.2z">
-                                            </path>
-                                        </svg>
-                                    </span>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td className="p-4 border-b border-slate-200">
-                                <div className="flex items-center gap-3">
-                                    <img src="https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-2.jpg"
-                                        alt="Alexa Liras" className="relative inline-block h-9 w-9 !rounded-full object-cover object-center" />
-                                    <div className="flex flex-col">
-                                        <p className="text-sm font-semibold text-slate-700">
-                                            Alexa Liras
-                                        </p>
-                                        <p
-                                            className="text-sm text-slate-500">
-                                            alexa@creative-tim.com
-                                        </p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td className="p-4 border-b border-slate-200">
-                                <div className="flex flex-col">
-                                    <p className="text-sm font-semibold text-slate-700">
-                                        Designer
-                                    </p>
-                                    <p
-                                        className="text-sm text-slate-500">
-                                        Marketing
-                                    </p>
-                                </div>
-                            </td>
-                            <td className="p-4 border-b border-slate-200">
-                                <div className="w-max">
-                                    <div
-                                        className="relative grid items-center px-2 py-1 font-sans text-xs font-bold uppercase rounded-md select-none whitespace-nowrap bg-slate-100 text-slate-500">
-                                        <span className="">offline</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td className="p-4 border-b border-slate-200">
-                                <p className="text-sm text-slate-500">
-                                    23/04/18
-                                </p>
-                            </td>
-                            <td className="p-4 border-b border-slate-200">
-                                <button
-                                    className="relative h-10 max-h-[40px] w-10 max-w-[40px] select-none rounded-lg text-center align-middle font-sans text-xs font-medium uppercase text-slate-900 transition-all hover:bg-slate-900/10 active:bg-slate-900/20 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                                    type="button">
-                                    <span className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
-                                            className="w-4 h-4">
-                                            <path
-                                                d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32L19.513 8.2z">
-                                            </path>
-                                        </svg>
-                                    </span>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td className="p-4 border-b border-slate-200">
-                                <div className="flex items-center gap-3">
-                                    <img src="https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-1.jpg"
-                                        alt="Laurent Perrier"
-                                        className="relative inline-block h-9 w-9 !rounded-full object-cover object-center" />
-                                    <div className="flex flex-col">
-                                        <p className="text-sm font-semibold text-slate-700">
-                                            Laurent Perrier
-                                        </p>
-                                        <p
-                                            className="text-sm text-slate-500">
-                                            laurent@creative-tim.com
-                                        </p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td className="p-4 border-b border-slate-200">
-                                <div className="flex flex-col">
-                                    <p className="text-sm font-semibold text-slate-700">
-                                        Executive
-                                    </p>
-                                    <p
-                                        className="text-sm text-slate-500">
-                                        Projects
-                                    </p>
-                                </div>
-                            </td>
-                            <td className="p-4 border-b border-slate-200">
-                                <div className="w-max">
-                                    <div
-                                        className="relative grid items-center px-2 py-1 font-sans text-xs font-bold uppercase rounded-md select-none whitespace-nowrap bg-slate-100 text-slate-500">
-                                        <span className="">offline</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td className="p-4 border-b border-slate-200">
-                                <p className="text-sm text-slate-500">
-                                    19/09/17
-                                </p>
-                            </td>
-                            <td className="p-4 border-b border-slate-200">
-                                <button
-                                    className="relative h-10 max-h-[40px] w-10 max-w-[40px] select-none rounded-lg text-center align-middle font-sans text-xs font-medium uppercase text-slate-900 transition-all hover:bg-slate-900/10 active:bg-slate-900/20 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                                    type="button">
-                                    <span className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
-                                            className="w-4 h-4">
-                                            <path
-                                                d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32L19.513 8.2z">
-                                            </path>
-                                        </svg>
-                                    </span>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td className="p-4 border-b border-slate-200">
-                                <div className="flex items-center gap-3">
-                                    <img src="https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-4.jpg"
-                                        alt="Michael Levi" className="relative inline-block h-9 w-9 !rounded-full object-cover object-center" />
-                                    <div className="flex flex-col">
-                                        <p className="text-sm font-semibold text-slate-700">
-                                            Michael Levi
-                                        </p>
-                                        <p
-                                            className="text-sm text-slate-500">
-                                            michael@creative-tim.com
-                                        </p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td className="p-4 border-b border-slate-200">
-                                <div className="flex flex-col">
-                                    <p className="text-sm font-semibold text-slate-700">
-                                        Designer
-                                    </p>
-                                    <p
-                                        className="text-sm text-slate-500">
-                                        Developer
-                                    </p>
-                                </div>
-                            </td>
-                            <td className="p-4 border-b border-slate-200">
-                                <div className="w-max">
-                                    <div
-                                        className="relative grid items-center px-2 py-1 font-sans text-xs font-bold text-green-900 uppercase rounded-md select-none whitespace-nowrap bg-green-500/20">
-                                        <span className="">online</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td className="p-4 border-b border-slate-200">
-                                <p className="text-sm text-slate-500">
-                                    24/12/08
-                                </p>
-                            </td>
-                            <td className="p-4 border-b border-slate-200">
-                                <button
-                                    className="relative h-10 max-h-[40px] w-10 max-w-[40px] select-none rounded-lg text-center align-middle font-sans text-xs font-medium uppercase text-slate-900 transition-all hover:bg-slate-900/10 active:bg-slate-900/20 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                                    type="button"
-                                    data-dialog-target="dialog"
-                                >
-                                    <span className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
-                                            className="w-4 h-4">
-                                            <path
-                                                d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32L19.513 8.2z">
-                                            </path>
-                                        </svg>
-                                    </span>
-                                </button>
-                            </td>
-                        </tr>
-
+                                    </td>
+                                    <td className="p-4 border-b border-slate-200">
+                                        <button className="relative h-10 max-h-[40px] w-10 max-w-[40px] select-none rounded-lg text-center align-middle font-sans text-xs font-medium uppercase text-slate-900 transition-all hover:bg-slate-900/10 active:bg-slate-900/20 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                                            type="button"
+                                            data-dialog-target="dialog">
+                                            <span className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
+                                                    className="w-4 h-4">
+                                                    <path d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32L19.513 8.2z">
+                                                    </path>
+                                                </svg>
+                                            </span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        }
                     </tbody>
                 </table>
             </div>
@@ -347,5 +202,103 @@ function TabelaKorisnika() {
             </div>
         </div>
     </div>
+    <Modal />
+    </>
+    )
+}
+
+function Modal() {
+    function zatvoriModal(){
+        let mod = document.getElementById("modal");
+        mod.classList.add("hidden")
+    }
+
+
+
+    return (
+
+        <div
+            className="fixed inset-0 z-50 grid place-content-center p-4 hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modalTitle"
+            id="modal"
+        >
+            <div className="w-full max-w-lg min-w-md rounded-lg bg-slate-800 text-white p-6 shadow-lg">
+                <div className="flex items-start justify-between mb-6">
+                    <h2 id="modalTitle" className="text-xl font-bold text-white sm:text-2xl">Dodaj korisnika</h2>
+
+                    <button
+                        type="button"
+                        className="-me-4 -mt-4 rounded-full p-2 text-white transition-colors hover:bg-gray-50 hover:text-gray-600 focus:outline-none"
+                        aria-label="Close"
+                        onClick={zatvoriModal}
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="size-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M6 18L18 6M6 6l12 12"
+                            />
+                        </svg>
+                    </button>
+                </div>
+                <form className="space-y-4 grid grid-cols-2 gap-x-5">
+                    <div>
+                        <label htmlFor="ime" className="block text-sm/6 font-medium text-white">Ime i prezime</label>
+                        <div className="mt-2">
+                            <input type="text" name="ime" id="ime" required className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+                        </div>
+                    </div>
+                    <div>
+                        <label htmlFor="email" className="block text-sm/6 font-medium text-white">Email adresa</label>
+                        <div className="mt-2">
+                            <input type="email" name="email" id="email" autoComplete="email" required className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+                        </div>
+                    </div>
+                    <div>
+                        <label htmlFor="sluzba" className="block text-sm/6 font-medium text-white">Sluzba</label>
+                        <div className="mt-2">
+                            <input type="text" name="sluzba" id="sluzba" required className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label htmlFor="uloga" className="block text-sm/6 font-medium text-white">Tip naloga</label>
+                        <div className="mt-2">
+                            <select name="uloga" id="uloga" required className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
+                                <option value="user" className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">user</option>
+                                <option value="admin" className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">admin</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label htmlFor="password" className="block text-sm/6 font-medium text-white">Sifra</label>
+                        <div className="mt-2">
+                            <input type="password" name="password" id="password" autoComplete="current-password" required className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label htmlFor="password" className="block text-sm/6 font-medium text-white">Potvrdi Sifru</label>
+                        <div className="mt-2">
+                            <input type="password" name="cpassword" id="cpassword" autoComplete="current-password" required className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <button type="submit" className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Prijavi se</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     )
 }

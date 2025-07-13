@@ -4,3 +4,12 @@
 .react-datepicker-wrapper {
     width: 100% ;
 }
+
+#login {
+    background-image: url("./assets/arhiva.png");
+    background-position: top left;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+

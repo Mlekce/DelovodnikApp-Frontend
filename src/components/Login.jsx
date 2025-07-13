@@ -49,14 +49,15 @@ export default function Login() {
     });
   }
   return (
-    <div className="flex h-screen flex-col justify-center px-6 py-12 lg:px-8">
+    <div className="flex h-screen flex-col justify-center px-6 py-12 lg:px-8" id="login">
+      <div className="bg-white border border-gray-200 sm:mx-auto sm:w-full sm:max-w-md py-6 px-6 rounded-2xl shadow-xl">      
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <img className="mx-auto h-18 w-auto" src={icon} alt="Republicki geodetski zavod" />
         <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Delovodnik prijava </h2>
       </div>
 
       {poruka &&
-        <div className="block text-sm/6 font-medium mt-5 text-green-600 text-center">
+        <div className="block text-sm/6 mt-5 bg-green-600 text-white font-semibold text-center">
           {poruka}
         </div>
       }
@@ -91,6 +92,7 @@ export default function Login() {
           Nemate nalog?
           <a href="/register" className="font-semibold text-indigo-600 hover:text-indigo-500"> Registruj se</a>
         </p>
+      </div>
       </div>
     </div>
   )

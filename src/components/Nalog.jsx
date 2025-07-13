@@ -1,7 +1,8 @@
 import Header from "./Header";
 import avatar from "../assets/person.png"
-import {format} from "date-fns";
+import { format } from "date-fns";
 import { useState } from "react";
+import "../index.css"
 
 export default function KomponentaNalog() {
     return (
@@ -287,7 +288,6 @@ function Nalog() {
                         </button>
                     </div>
                 </form>
-
             </div>
         </>
     )
