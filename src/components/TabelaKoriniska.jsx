@@ -31,12 +31,30 @@ function TabelaKorisnika() {
         setListaKorisnika(data.poruka);
     }
 
+    async function izbrisiKorisnika(korid) {
+        let url = `http://localhost:4000/api/users/del/${korid}`;
+        let options = {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                id: korid
+            })
+        }
+        let response = await fetch(url, options);
+        let data = await response.json();
+        console.log(data.poruka);
+        return
+    }
+
     function otvoriModal() {
         let mod = document.getElementById("modal");
         mod.classList.remove("hidden");
     }
 
-     function otvoriModalIzmeni(id) {
+    function otvoriModalIzmeni(id) {
         setSelectedKorisnikId(id);
         document.getElementById("modal-izmeni").classList.remove("hidden");
     }
@@ -191,6 +209,19 @@ function TabelaKorisnika() {
                                                         </svg>
                                                     </span>
                                                 </button>
+                                                <button className="relative h-10 max-h-[40px] w-10 max-w-[40px] select-none rounded-lg text-center align-middle font-sans text-xs font-medium uppercase text-slate-900 transition-all hover:bg-slate-900/10 active:bg-slate-900/20 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                                                    type="button"
+                                                    data-dialog-target="dialog"
+                                                    onClick={() => izbrisiKorisnika(kor.id)}
+                                                    data-korid={kor.id}
+                                                >
+                                                    <span className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-4 h-4">
+                                                            <path d="M9 3a1 1 0 00-1 1v1H4.75a.75.75 0 000 1.5H5.5v12A2.5 2.5 0 008 21h8a2.5 2.5 0 002.5-2.5V6h.75a.75.75 0 000-1.5H16V4a1 1 0 00-1-1H9zm1 3V4h4v2H10zm-1.5 3.25a.75.75 0 011.5 0v8.5a.75.75 0 01-1.5 0v-8.5zm4 0a.75.75 0 011.5 0v8.5a.75.75 0 01-1.5 0v-8.5z" />
+                                                        </svg>
+                                                    </span>
+
+                                                </button>
                                             </td>
                                         </tr>
                                     ))
@@ -225,7 +256,7 @@ function TabelaKorisnika() {
 
 function ModalIzmeniKorisnickePodatke({ korisnikId }) {
     const [modalIzmeniPoruka, setIzmeniModalPoruka] = useState("");
-    
+
     function zatvoriModalIzmeni() {
         let mod = document.getElementById("modal-izmeni");
         mod.classList.add("hidden")
@@ -252,7 +283,7 @@ function ModalIzmeniKorisnickePodatke({ korisnikId }) {
         return true
     }
 
-    async function resetujLozinku(){
+    async function resetujLozinku() {
         let forma = document.getElementById("modal-forma-2");
         let formData = new FormData(forma);
 
@@ -260,8 +291,8 @@ function ModalIzmeniKorisnickePodatke({ korisnikId }) {
         let lozinka = formData.get("password");
         let potvrdi_lozinka = formData.get("cpassword");
 
-        if(!validacijaLozinke(lozinka, potvrdi_lozinka)) return;
-        if(!id) return;
+        if (!validacijaLozinke(lozinka, potvrdi_lozinka)) return;
+        if (!id) return;
 
         try {
             let options = {
@@ -270,7 +301,7 @@ function ModalIzmeniKorisnickePodatke({ korisnikId }) {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`,
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify ({
+                body: JSON.stringify({
                     novaLozinka: lozinka,
                     id: id
                 })
@@ -378,7 +409,7 @@ function ModalIzmeniKorisnickePodatke({ korisnikId }) {
                         <div className="hidden">
                             <label htmlFor="id_izmeni" className="block text-sm/6 font-medium text-white">Id</label>
                             <div className="mt-2">
-                                <input type="text" name="korid" id="id_izmeni" value={korisnikId || ""} readOnly className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"/>
+                                <input type="text" name="korid" id="id_izmeni" value={korisnikId || ""} readOnly className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
                             </div>
                         </div>
 
