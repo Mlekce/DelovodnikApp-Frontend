@@ -132,7 +132,7 @@ export default function FormaPredmet() {
   try {
     let response = await fetch(url, options);
     if (!response.ok) {
-      setPoruka("Greška: Neuspešno preuzimanje podataka!");
+      setPoruka("Nema stavki za prikaz!");
       return;
     }
     let data = await response.json();

@@ -231,6 +231,64 @@ function ModalIzmeniKorisnickePodatke({ korisnikId }) {
         mod.classList.add("hidden")
     }
 
+    function validacijaLozinke(lozinka, plozinka) {
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+        if (lozinka !== plozinka) {
+            setIzmeniModalPoruka("Lozinke se ne podudaraju");
+            return false
+        }
+
+        if (!lozinka || !plozinka) {
+            setIzmeniModalPoruka("Lozinka ne moze biti prazna");
+            return false
+        }
+
+        if (!regex.test(lozinka)) {
+            setIzmeniModalPoruka("Sifra ne ispunjava kompleksnost");
+            return false
+        }
+
+        return true
+    }
+
+    async function resetujLozinku(){
+        let forma = document.getElementById("modal-forma-2");
+        let formData = new FormData(forma);
+
+        let id = formData.get("korid");
+        let lozinka = formData.get("password");
+        let potvrdi_lozinka = formData.get("cpassword");
+
+        if(!validacijaLozinke(lozinka, potvrdi_lozinka)) return;
+        if(!id) return;
+
+        try {
+            let options = {
+                method: "PUT",
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify ({
+                    novaLozinka: lozinka,
+                    id: id
+                })
+
+            }
+            let url = `http://localhost:4000/api/users/reset/${id}`;
+            let response = await fetch(url, options);
+            let data = await response.json();
+            setIzmeniModalPoruka(data.poruka);
+        } catch (error) {
+            console.log(error.message);
+            setIzmeniModalPoruka(`Doslo je do greske: ${error.message}`)
+            return false
+        }
+        forma.reset();
+        return true
+    }
+
     return (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-10 hidden" id="modal-izmeni">
             <div
@@ -242,7 +300,7 @@ function ModalIzmeniKorisnickePodatke({ korisnikId }) {
             >
                 <div className="w-full max-w-lg min-w-md rounded-lg bg-slate-800 text-white p-6 shadow-lg ">
                     <div className="flex items-start justify-between mb-6">
-                        <h2 id="modalTitleIzmeni" className="text-xl font-bold text-white sm:text-2xl">Dodaj korisnika</h2>
+                        <h2 id="modalTitleIzmeni" className="text-xl font-bold text-white sm:text-2xl">Izmeni lozinku korisnika</h2>
 
                         <button
                             type="button"
@@ -269,8 +327,9 @@ function ModalIzmeniKorisnickePodatke({ korisnikId }) {
                     <p className="p2 bg-green-500 text-white text-center">{modalIzmeniPoruka}</p>
                     <form className="space-y-4 grid grid-cols-2 gap-x-5" id="modal-forma-2" onSubmit={(e) => {
                         e.preventDefault()
-                        izmeniPodatkeKorisnika()
+                        resetujLozinku()
                     }}>
+                        {/*
                         <div>
                             <label htmlFor="ime_izmeni" className="block text-sm/6 font-medium text-white">Ime i prezime</label>
                             <div className="mt-2">
@@ -300,29 +359,31 @@ function ModalIzmeniKorisnickePodatke({ korisnikId }) {
                             </div>
                         </div>
 
+                        */}
+
                         <div>
                             <label htmlFor="password_izmeni" className="block text-sm/6 font-medium text-white">Sifra</label>
                             <div className="mt-2">
-                                <input type="password" name="password" id="password_izmeni" autoComplete="current-password" className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+                                <input type="password" name="password" id="password_izmeni" autoComplete="password" className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
                             </div>
                         </div>
 
                         <div>
                             <label htmlFor="cpassword_izmeni" className="block text-sm/6 font-medium text-white">Potvrdi Sifru</label>
                             <div className="mt-2">
-                                <input type="password" name="cpassword" id="cpassword_izmeni" autoComplete="current-password" className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+                                <input type="password" name="cpassword" id="cpassword_izmeni" autoComplete="confirm-password" className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
                             </div>
                         </div>
 
-                        <div>
+                        <div className="hidden">
                             <label htmlFor="id_izmeni" className="block text-sm/6 font-medium text-white">Id</label>
                             <div className="mt-2">
-                                <input type="text" name="id" id="id_izmeni" value={korisnikId || ""} autoComplete="current-password" className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"/>
+                                <input type="text" name="korid" id="id_izmeni" value={korisnikId || ""} readOnly className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"/>
                             </div>
                         </div>
 
                         <div>
-                            <button type="submit" className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Izmeni podatke</button>
+                            <button type="submit" className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Resetuj lozinku</button>
                         </div>
                     </form>
                 </div>
