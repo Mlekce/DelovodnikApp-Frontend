@@ -19,7 +19,7 @@ const router = createBrowserRouter([
   { path: "/index", element: <Navigate to="/" replace /> },
   { path: "/pocetna", element: <Navigate to="/" replace /> },
   { path: "/pracenje", element: (<ProtectedRoute><PretragaPredmeta /></ProtectedRoute>) },
-  { path: "/korisnici", element: (<ProtectedRoute><Korisnici /></ProtectedRoute>) },
+  { path: "/korisnici", element: (<AdminRoute><Korisnici /></AdminRoute>) },
   { path: "/statistika", element: (<ProtectedRoute><StranicaStatistika /></ProtectedRoute>) },
   { path: "/delovodnik", element: (<ProtectedRoute> <App /></ProtectedRoute>) },
   { path: "/profil", element: (<ProtectedRoute> <KomponentaNalog /></ProtectedRoute>) },
@@ -35,7 +35,27 @@ createRoot(document.getElementById('root')).render(
 
 
 function ProtectedRoute({ children }) {
-  const isAuth = !!localStorage.getItem("token");
+  const token = localStorage.getItem("token");
+  const isAuth = token && isTokenValid(token);
 
   return isAuth ? children : <Navigate to="/" replace />;
+}
+
+function AdminRoute({ children }) {
+  const user = JSON.parse(localStorage.getItem("korisnik") || "{}");
+  const token = localStorage.getItem("token");
+  const isAuth = token && isTokenValid(token);
+
+  return user.uloga === "admin" && isAuth
+    ? children
+    : <Navigate to="/" replace />;
+}
+
+function isTokenValid(token) {
+  try {
+    const { exp } = jwtDecode(token);
+    return exp * 1000 > Date.now();
+  } catch {
+    return false;
+  }
 }
