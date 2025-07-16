@@ -37,7 +37,7 @@ export default function Header() {
                         <a href="/statistika" className="hover:underline">Statistika</a>
                         <a href="/korisnici" className="hover:underline">Korisnici</a>
                         <a href="/profil" className="hover:underline">Nalog</a>
-                        <a href="/izlogujse" className="hover:underline">Izadji</a>
+                        <a href="/odjava" className="hover:underline">Izadji</a>
                     </nav>
                 </div>
 
@@ -45,10 +45,12 @@ export default function Header() {
                 {isOpen && (
                     <div className="mt-4 md:hidden flex flex-col gap-2" >
                         <a href="/" className="hover:underline">Početna</a>
+                        <a href="/delovodnik" className="hover:underline">Unos</a>
+                        <a href="/pracenje" className="hover:underline">Pracenje</a>
                         <a href="/statistika" className="hover:underline">Statistika</a>
                         <a href="/korisnici" className="hover:underline">Korisnici</a>
-                        <a href="/profil" className="hover:underline">Profil</a>
-                        <a href="/izlogujse" className="hover:underline">Izadji</a>
+                        <a href="/profil" className="hover:underline">Nalog</a>
+                        <a href="/odjava" className="hover:underline">Izadji</a>
                     </div>
                 )}
             </header >

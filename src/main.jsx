@@ -5,6 +5,7 @@ import './index.css'
 import App from './App.jsx'
 
 import Login from "./components/Login"
+import Logout from "./components/Logout"
 import Stranica404 from './components/Stranica404.jsx'
 import PretragaPredmeta from './components/PretragaPredmeta.jsx'
 import Korisnici from './components/TabelaKoriniska.jsx'
@@ -14,14 +15,15 @@ import Register from "./components/Register.jsx"
 
 const router = createBrowserRouter([
   { path: "/", element: <Login /> },
-  { path: "/register", element: <Register />},
+  { path: "/register", element: <Register /> },
   { path: "/index", element: <Navigate to="/" replace /> },
   { path: "/pocetna", element: <Navigate to="/" replace /> },
-  { path: "/pracenje", element: <PretragaPredmeta /> },
-  { path: "/korisnici", element: <Korisnici /> },
-  { path: "/statistika", element: <StranicaStatistika /> },
-  { path: "/delovodnik", element: <App /> },
-  { path: "/profil", element: <KomponentaNalog /> },
+  { path: "/pracenje", element: (<ProtectedRoute><PretragaPredmeta /></ProtectedRoute>) },
+  { path: "/korisnici", element: (<ProtectedRoute><Korisnici /></ProtectedRoute>) },
+  { path: "/statistika", element: (<ProtectedRoute><StranicaStatistika /></ProtectedRoute>) },
+  { path: "/delovodnik", element: (<ProtectedRoute> <App /></ProtectedRoute>) },
+  { path: "/profil", element: (<ProtectedRoute> <KomponentaNalog /></ProtectedRoute>) },
+  { path: "/odjava", element: <Logout /> },
   { path: "*", element: <Stranica404 /> }
 ]);
 
@@ -30,3 +32,10 @@ createRoot(document.getElementById('root')).render(
     <RouterProvider router={router} />
   </StrictMode>,
 )
+
+
+function ProtectedRoute({ children }) {
+  const isAuth = !!localStorage.getItem("token");
+
+  return isAuth ? children : <Navigate to="/" replace />;
+}

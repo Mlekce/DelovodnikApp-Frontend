@@ -13,10 +13,40 @@ export default function Korisnici() {
 function TabelaKorisnika() {
     const [listaKorisnika, setListaKorisnika] = useState({ sviKorisnici: [], brojKorisnika: 0 });
     const [selectedKorisnikId, setSelectedKorisnikId] = useState(null);
+    const [displayUsers, setDisplayUsers] = useState([])
+    const [stranica, setStranica] = useState(1)
+    const noPrikaz = 3;
+    let stranice = Math.ceil(listaKorisnika.brojKorisnika / noPrikaz)
 
     useEffect(() => {
         getUsers()
     }, []);
+
+    useEffect(() => {
+        setDisplayUsers(() => {
+            let start = noPrikaz * (stranica - 1);
+            let end = noPrikaz * (stranica)
+            return listaKorisnika.sviKorisnici.slice(start, end);
+        })
+    }, [listaKorisnika, stranica]);
+
+    function sledecaStranica() {
+        setStranica(prevVal => {
+            if (prevVal < stranice) {
+                return prevVal += 1
+            }
+            return prevVal
+        })
+    }
+
+    function prethodnaStranica() {
+        setStranica(prevVal => {
+            if (prevVal <= 1) {
+                return prevVal = 1
+            }
+            return prevVal -= 1
+        })
+    }
 
     async function getUsers() {
         let url = "http://localhost:4000/api/users";
@@ -46,6 +76,7 @@ function TabelaKorisnika() {
         let response = await fetch(url, options);
         let data = await response.json();
         console.log(data.poruka);
+        getUsers()
         return
     }
 
@@ -83,11 +114,13 @@ function TabelaKorisnika() {
                                 <p className="text-slate-500">Izmenite podatke o zaposlenima</p>
                             </div>
                             <div className="flex flex-col gap-2 shrink-0 sm:flex-row">
+                                {/*
                                 <button
                                     className="rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 focus:ring focus:ring-slate-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                                     type="button">
                                     Vidi sve
                                 </button>
+                                */}
                                 <button
                                     onClick={otvoriModal}
                                     className="flex select-none items-center gap-2 rounded bg-slate-800 py-2.5 px-4 text-xs font-semibold text-white shadow-md shadow-slate-900/10 transition-all hover:shadow-lg hover:shadow-slate-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
@@ -166,8 +199,8 @@ function TabelaKorisnika() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {listaKorisnika.sviKorisnici.length > 0 &&
-                                    listaKorisnika.sviKorisnici.map((kor, i) => (
+                                {displayUsers.length > 0 &&
+                                    displayUsers.map((kor, i) => (
                                         <tr key={kor.id || i}>
                                             <td className="p-4 border-b border-slate-200">
                                                 <div className="flex items-center gap-3">
@@ -231,17 +264,21 @@ function TabelaKorisnika() {
                     </div>
                     <div className="flex items-center justify-between p-3">
                         <p className="block text-sm text-slate-500">
-                            Strana 1 od 10
+                            {`Strana ${stranica} od ${stranice}`}
                         </p>
                         <div className="flex gap-1">
                             <button
                                 className="rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 focus:ring focus:ring-slate-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                                type="button">
+                                type="button"
+                                onClick={prethodnaStranica}
+                            >
                                 Prethodna
                             </button>
                             <button
                                 className="rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 focus:ring focus:ring-slate-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                                type="button">
+                                type="button"
+                                onClick={sledecaStranica}
+                            >
                                 Sledeca
                             </button>
                         </div>
@@ -360,37 +397,6 @@ function ModalIzmeniKorisnickePodatke({ korisnikId }) {
                         e.preventDefault()
                         resetujLozinku()
                     }}>
-                        {/*
-                        <div>
-                            <label htmlFor="ime_izmeni" className="block text-sm/6 font-medium text-white">Ime i prezime</label>
-                            <div className="mt-2">
-                                <input type="text" name="ime" id="ime_izmeni" className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
-                            </div>
-                        </div>
-                        <div>
-                            <label htmlFor="email_izmeni" className="block text-sm/6 font-medium text-white">Email adresa</label>
-                            <div className="mt-2">
-                                <input type="email" name="email" id="email_izmeni" autoComplete="email" className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
-                            </div>
-                        </div>
-                        <div>
-                            <label htmlFor="sluzba_izmeni" className="block text-sm/6 font-medium text-white">Sluzba</label>
-                            <div className="mt-2">
-                                <input type="text" name="sluzba" id="sluzba_izmeni" className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label htmlFor="uloga_izmeni" className="block text-sm/6 font-medium text-white">Tip naloga</label>
-                            <div className="mt-2">
-                                <select name="uloga" id="uloga_izmeni" className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
-                                    <option value="user" className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">user</option>
-                                    <option value="admin" className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">admin</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        */}
 
                         <div>
                             <label htmlFor="password_izmeni" className="block text-sm/6 font-medium text-white">Sifra</label>
