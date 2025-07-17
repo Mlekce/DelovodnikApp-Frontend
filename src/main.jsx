@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
+import {jwtDecode} from "jwt-decode";
 
 import Login from "./components/Login"
 import Logout from "./components/Logout"
