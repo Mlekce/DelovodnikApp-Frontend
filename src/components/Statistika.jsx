@@ -1,4 +1,4 @@
-import React, { PureComponent, useState } from 'react';
+import React, { PureComponent, useEffect, useState } from 'react';
 import { FileDown, FileSpreadsheet } from "lucide-react";
 import {
     ResponsiveContainer,
@@ -26,6 +26,31 @@ export default function StranicaStatistika() {
 }
 
 function Statistika() {
+    let korisnik = JSON.parse(localStorage.getItem("korisnik"));
+    let [stats, setStats] = useState({poruka: "", dan: "", nedelja: "", mesec: "", godina: "", sedamDana: ""});
+    
+    useEffect(()=> {
+        povuciPodatke()
+    }, []);
+
+    async function povuciPodatke(){
+        let url = `http://localhost:4000/api/predmet/stats?id=${korisnik.id}`;
+        let options = {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                "Content-Type": "application/json",
+            }
+        }
+        try {
+            let response = await fetch(url, options);
+            let data = await response.json()
+            console.log(data)
+            setStats(data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
     return (
         <>
             <div className="max-w-[1000px] mx-auto p-6 space-y-0 grid grid-cols-1 sm:grid-cols-12 gap-6 shadow-sm rounded-4xl">
@@ -40,13 +65,13 @@ function Statistika() {
                 </div>
                 <div className="col-span-12 sm:col-span-3 flex flex-col gap-6">
                     <h2 className='text-xl font-semibold text-gray-700 mt-6'>Prosek</h2>
-                    <StatCard title="Dnevno" count={5} color="bg-blue-500" />
-                    <StatCard title="Nedeljno" count={34} color="bg-green-500" />
-                    <StatCard title="Mesečno" count={127} color="bg-yellow-500" />
-                    <StatCard title="Godišnje" count={1045} color="bg-red-500" />
+                    <StatCard title="Dnevno" count={stats.dan} color="bg-blue-500" />
+                    <StatCard title="Nedeljno" count={stats.nedelja} color="bg-green-500" />
+                    <StatCard title="Mesečno" count={stats.mesec} color="bg-yellow-500" />
+                    <StatCard title="Godišnje" count={stats.godina} color="bg-red-500" />
                 </div>
                 <div className=" col-span-12 sm:col-span-9">
-                    <PredmetiNedelja />
+                    <PredmetiNedelja dani={stats.sedamDana}/>
                     <PredmetiGodina />
                 </div>
             </div>
@@ -105,34 +130,38 @@ function PredmetiGodina() {
     );
 }
 
-function PredmetiNedelja() {
-    const data = [
-        { dan: "Ponedeljak", broj: 7 },
-        { dan: "Utorak", broj: 15 },
-        { dan: "Sreda", broj: 2 },
-        { dan: "Cetvrtak", broj: 11 },
-        { dan: "Petak", broj: 9 },
-        { dan: "Subota", broj: 0 },
-        { dan: "Nedelja", broj: 0 }
-    ];
+function PredmetiNedelja({ dani }) {
+  const [podaci, setPodaci] = useState([]);
 
-    const [podaciNedelja, setPodaciNedelja] = useState(data);
+  useEffect(() => {
+    if (Array.isArray(dani)) {
+      setPodaci(dani);
+    }
+  }, [dani]);
 
-    return (
-        <div className="bg-white p-6 ">
-            <h2 className="text-xl font-semibold text-gray-700 mb-4">Nedeljni broj predmeta</h2>
-            <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={podaciNedelja}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="dan" />
-                    <YAxis ticks={[0, 5, 10, 15, 20, 25]} />
-                    <Tooltip />
-                    <Bar dataKey="broj" fill="#4f46e5" barSize={40} />
-                </BarChart>
-            </ResponsiveContainer>
-            <p className="mt-0 text-sm text-gray-600 text-center">
-                Najviše ste uradili predmeta u <span className="font-semibold text-indigo-600">Utorak</span> — ukupno <span className="font-semibold">15</span>.
-            </p>
-        </div>
-    );
+  return (
+    <div className="bg-white p-6">
+      <h2 className="text-xl font-semibold text-gray-700 mb-4">Nedeljni broj predmeta</h2>
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={podaci}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis
+            dataKey="dan"
+            interval={0}
+            tick={{ fontSize: 12 }}
+            tickFormatter={(str) => {
+              const days = ["Ned", "Pon", "Uto", "Sre", "Čet", "Pet", "Sub"];
+              return days[new Date(str).getDay()];
+            }}
+          />
+          <YAxis ticks={[0, 5, 10, 15, 20, 25]} />
+          <Tooltip />
+          <Bar dataKey="broj" fill="#4f46e5" barSize={40} />
+        </BarChart>
+      </ResponsiveContainer>
+      <p className="mt-0 text-sm text-gray-600 text-center">
+        Najviše ste uradili predmeta u <span className="font-semibold text-indigo-600">Utorak</span> — ukupno <span className="font-semibold">15</span>.
+      </p>
+    </div>
+  );
 }
