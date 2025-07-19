@@ -5,7 +5,7 @@
     width: 100% ;
 }
 
-#login {
+#login, #register {
     background-image: url("./assets/arhiva.png");
     background-position: top left;
     background-repeat: no-repeat;
