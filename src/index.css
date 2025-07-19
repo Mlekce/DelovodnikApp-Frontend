@@ -13,3 +13,8 @@
     background-attachment: fixed;
 }
 
+#register label::after {
+    content: "*";
+    color: red;
+    margin-left: 5px;
+}
