@@ -27,13 +27,13 @@ export default function StranicaStatistika() {
 
 function Statistika() {
     let korisnik = JSON.parse(localStorage.getItem("korisnik"));
-    let [stats, setStats] = useState({poruka: "", dan: "", nedelja: "", mesec: "", godina: "", sedamDana: ""});
-    
-    useEffect(()=> {
+    let [stats, setStats] = useState({ poruka: "", dan: "", nedelja: "", mesec: "", godina: "", sedamDana: "" });
+
+    useEffect(() => {
         povuciPodatke()
     }, []);
 
-    async function povuciPodatke(){
+    async function povuciPodatke() {
         let url = `http://localhost:4000/api/predmet/stats?id=${korisnik.id}`;
         let options = {
             method: "GET",
@@ -71,8 +71,8 @@ function Statistika() {
                     <StatCard title="Godišnje" count={stats.godina} color="bg-red-500" />
                 </div>
                 <div className=" col-span-12 sm:col-span-9">
-                    <PredmetiNedelja dani={stats.sedamDana}/>
-                    <PredmetiGodina />
+                    <PredmetiNedelja dani={stats.sedamDana} />
+                    <PredmetiGodina meseci={stats.sestMeseci}/>
                 </div>
             </div>
 
@@ -89,18 +89,28 @@ function StatCard({ title, count, color }) {
         </div>
     );
 }
-function PredmetiGodina() {
-    const data = [
-        { mesec: "Januar", broj: 200 },
-        { mesec: "Februar", broj: 150 },
-        { mesec: "Mart", broj: 268 },
-        { mesec: "April", broj: 110 },
-        { mesec: "Maj", broj: 221 },
-        { mesec: "Jun", broj: 89 },
-        { mesec: "Jul", broj: 300 }
-    ];
+function PredmetiGodina({ meseci }) {
+    const [podaci, setPodaci] = useState([]);
+    const [najuspesnijiMesec, setNajuspesnijiMesec] = useState(["", null]);
 
-    const [podaci, setPodaci] = useState(data);
+    useEffect(() => {
+        if (Array.isArray(meseci)) {
+            setPodaci(meseci);
+            setNajuspesnijiMesec(pronadjiMaxVrednostiMesec(meseci));
+        }
+    }, [meseci]);
+
+    function pronadjiMaxVrednostiMesec(arr) {
+        const months = ["Januar", "Februar", "Mart", "April", "Maj", "Jun", "Jul", "Avgust", "Septembar", "Oktobar", "Novembar", "Decembar"];
+        let maxBroj = 0, maxMesec = 0;
+        arr.forEach((obj) => {
+            if (obj.broj > maxBroj) {
+                maxBroj = obj.broj
+                maxMesec = obj.mesec
+            }
+        });
+        return [months[maxMesec], maxBroj]
+    }
 
     return (
         <div className="bg-white p-6">
@@ -108,7 +118,12 @@ function PredmetiGodina() {
             <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={podaci}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="mesec" />
+                    <XAxis dataKey="mesec" interval={0}
+                        tick={{ fontSize: 12 }}
+                        tickFormatter={(num) => {
+                           const months = ["Januar", "Februar", "Mart", "April", "Maj", "Jun", "Jul", "Avgust", "Septembar", "Oktobar", "Novembar", "Decembar"];
+                            return months[num];
+                        }}/>
                     <YAxis ticks={[0, 100, 200, 300, 400]} />
                     <Tooltip />
                     <Legend />
@@ -124,44 +139,59 @@ function PredmetiGodina() {
                 </LineChart>
             </ResponsiveContainer>
             <p className="mt-4 text-sm text-gray-600 text-center">
-                Najviše ste uradili predmeta u <span className="font-semibold text-indigo-600">Mart</span> — ukupno <span className="font-semibold">268</span>.
+                Najviše ste uradili predmeta u <span className="font-semibold text-indigo-600">{najuspesnijiMesec[0]}</span> — ukupno <span className="font-semibold">{najuspesnijiMesec[1]}</span>.
             </p>
         </div>
     );
 }
 
 function PredmetiNedelja({ dani }) {
-  const [podaci, setPodaci] = useState([]);
+    const [podaci, setPodaci] = useState([]);
+    const [najuspesnijiDan, setNajuspesnijiDan] = useState(["", null]);
 
-  useEffect(() => {
-    if (Array.isArray(dani)) {
-      setPodaci(dani);
+
+    useEffect(() => {
+        if (Array.isArray(dani)) {
+            setPodaci(dani);
+            setNajuspesnijiDan(pronadjiMaxVrednosti(dani))
+        }
+    }, [dani]);
+
+    function pronadjiMaxVrednosti(arr) {
+        const days = ["Nedelja", "Ponedeljak", "Utorak", "Sreda", "Četvrtak", "Petak", "Subota"];
+        let maxBroj = 0, maxDan = "";
+        arr.forEach(day => {
+            if (day.broj > maxBroj) {
+                maxBroj = day.broj
+                maxDan = day.dan
+            }
+        });
+        return [days[new Date(maxDan).getDay()], maxBroj]
     }
-  }, [dani]);
 
-  return (
-    <div className="bg-white p-6">
-      <h2 className="text-xl font-semibold text-gray-700 mb-4">Nedeljni broj predmeta</h2>
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={podaci}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="dan"
-            interval={0}
-            tick={{ fontSize: 12 }}
-            tickFormatter={(str) => {
-              const days = ["Ned", "Pon", "Uto", "Sre", "Čet", "Pet", "Sub"];
-              return days[new Date(str).getDay()];
-            }}
-          />
-          <YAxis ticks={[0, 5, 10, 15, 20, 25]} />
-          <Tooltip />
-          <Bar dataKey="broj" fill="#4f46e5" barSize={40} />
-        </BarChart>
-      </ResponsiveContainer>
-      <p className="mt-0 text-sm text-gray-600 text-center">
-        Najviše ste uradili predmeta u <span className="font-semibold text-indigo-600">Utorak</span> — ukupno <span className="font-semibold">15</span>.
-      </p>
-    </div>
-  );
+    return (
+        <div className="bg-white p-6">
+            <h2 className="text-xl font-semibold text-gray-700 mb-4">Nedeljni broj predmeta</h2>
+            <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={podaci}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                        dataKey="dan"
+                        interval={0}
+                        tick={{ fontSize: 12 }}
+                        tickFormatter={(str) => {
+                            const days = ["Ned", "Pon", "Uto", "Sre", "Čet", "Pet", "Sub"];
+                            return days[new Date(str).getDay()];
+                        }}
+                    />
+                    <YAxis ticks={[0, 5, 10, 15, 20, 25]} />
+                    <Tooltip />
+                    <Bar dataKey="broj" fill="#4f46e5" barSize={40} />
+                </BarChart>
+            </ResponsiveContainer>
+            <p className="mt-0 text-sm text-gray-600 text-center">
+                Najviše ste uradili predmeta u <span className="font-semibold text-indigo-600">{najuspesnijiDan[0]}</span> — ukupno <span className="font-semibold">{najuspesnijiDan[1]}</span>.
+            </p>
+        </div>
+    );
 }
