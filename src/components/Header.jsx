@@ -7,6 +7,7 @@ import "../index.css"
 
 
 export default function Header() {
+    let korisnik = JSON.parse(localStorage.getItem("korisnik"));
     const [isOpen, setIsOpen] = useState(false);
 
     function toggleMenu() {
@@ -35,7 +36,7 @@ export default function Header() {
                         <a href="/delovodnik" className="hover:underline">Unos</a>
                         <a href="/pracenje" className="hover:underline">Pracenje</a>
                         <a href="/statistika" className="hover:underline">Statistika</a>
-                        <a href="/korisnici" className="hover:underline">Korisnici</a>
+                        {korisnik.uloga === "admin" && <a href="/korisnici" className="hover:underline">Korisnici</a>}
                         <a href="/profil" className="hover:underline">Nalog</a>
                         <a href="/odjava" className="hover:underline">Izadji</a>
                     </nav>
@@ -48,7 +49,7 @@ export default function Header() {
                         <a href="/delovodnik" className="hover:underline">Unos</a>
                         <a href="/pracenje" className="hover:underline">Pracenje</a>
                         <a href="/statistika" className="hover:underline">Statistika</a>
-                        <a href="/korisnici" className="hover:underline">Korisnici</a>
+                        {korisnik.uloga === "admin" && <a href="/korisnici" className="hover:underline">Korisnici</a>}
                         <a href="/profil" className="hover:underline">Nalog</a>
                         <a href="/odjava" className="hover:underline">Izadji</a>
                     </div>

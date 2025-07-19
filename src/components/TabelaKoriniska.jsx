@@ -15,7 +15,7 @@ function TabelaKorisnika() {
     const [selectedKorisnikId, setSelectedKorisnikId] = useState(null);
     const [displayUsers, setDisplayUsers] = useState([])
     const [stranica, setStranica] = useState(1)
-    const noPrikaz = 3;
+    const noPrikaz = 5;
     let stranice = Math.ceil(listaKorisnika.brojKorisnika / noPrikaz)
 
     useEffect(() => {
