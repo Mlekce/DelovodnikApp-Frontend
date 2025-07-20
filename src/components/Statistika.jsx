@@ -122,11 +122,13 @@ function Statistika() {
                     <button className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm transition" onClick={() => exportToPDF(stats, "Statistika po danima", "statistika_dani.pdf")}>
                         <FileDown size={16} /> Exportuj PDF
                     </button>
-                    {/* 
-                    <button className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm transition">
-                        <FileSpreadsheet size={16} /> Exportuj CSV
+                    
+                    <button onClick={() => {
+                        window.print()
+                    }} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm transition">
+                        <FileSpreadsheet size={16} /> Odstampaj
                     </button>
-                    */}
+                    
                 </div>
                 <div className="col-span-12 sm:col-span-3 flex flex-col gap-6">
                     <h2 className='text-xl font-semibold text-gray-700 mt-6'>Prosek</h2>

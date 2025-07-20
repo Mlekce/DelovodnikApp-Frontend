@@ -25,7 +25,6 @@ export default function Login() {
 
         const res = await fetch(url, options);
         const data = await res.json();
-
         return { ok: res.ok, data };
       } catch (err) {
         console.error(err);
@@ -35,7 +34,7 @@ export default function Login() {
 
     posaljiNaBekend(email, lozinka).then(({ ok, data }) => {
       if (!ok || !data?.token) {
-        setPoruka("Prijava nije uspela. Proverite podatke.");
+        setPoruka(data.poruka);
         return;
       }
 
