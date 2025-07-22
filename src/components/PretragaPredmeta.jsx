@@ -123,7 +123,7 @@ function Pracenje() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Datum podnošenja
+              Datum ekspedicije
             </label>
             <DatePicker
               selected={datumPodnosenja}
@@ -179,7 +179,7 @@ function Pracenje() {
         )}
       </div>
 
-      <TabelaPredmeta predmeti={predmeti} duzina={predmeti.length} />
+      <TabelaPredmeta predmeti={predmeti} duzina={predmeti.length} osvezi={pretraziPredmete} />
     </>
   );
 }

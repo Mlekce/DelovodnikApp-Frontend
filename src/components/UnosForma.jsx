@@ -97,7 +97,6 @@ export default function FormaPredmet() {
       try {
         const rezultat = await fetch(url, opcije);
         const podaci = await rezultat.json();
-        console.log(podaci);
         if (rezultat.status === 400) {
           setPoruka(podaci.poruka);
           return;
@@ -117,6 +116,7 @@ export default function FormaPredmet() {
     }
 
     posaljiNaBackend();
+    povuciPodatke()
   }
 
   async function povuciPodatke() {
@@ -180,7 +180,7 @@ export default function FormaPredmet() {
 
         <div className="w-full">
           <label className="block text-sm font-medium text-gray-700">
-            Datum podnošenja
+            Datum ekspedicije
           </label>
           <DatePicker
             selected={datumPodnosenja}
@@ -254,7 +254,7 @@ export default function FormaPredmet() {
       </div>
     </div>
     { !predmeti && <TabelaPredmeta predmeti={[]} duzina={0}/>}
-    { predmeti && <TabelaPredmeta predmeti={predmeti} duzina={predmeti.length}/>}
+    { predmeti && <TabelaPredmeta predmeti={predmeti} duzina={predmeti.length} osvezi={povuciPodatke}/>}
     
     </>
   )
